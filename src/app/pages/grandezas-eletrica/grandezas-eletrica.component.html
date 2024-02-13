@@ -1,0 +1,112 @@
+<p-card header="Grandezas Elétricas">
+  <p-accordion [multiple]="true" [activeIndex]="[0,1,2]">
+    <p-accordionTab header="Fase A">
+      <table>
+        <tr>
+          <td>Potência Ativa</td>
+          <td>{{nowData.pa | number : '1.2-2'}} [W]</td>
+        </tr>
+        <tr>
+          <td>Potência Reativa</td>
+          <td>{{nowData.qa | number : '1.2-2'}} [VAr]</td>
+        </tr>
+        <tr>
+          <td>Potência Aparente</td>
+          <td>{{nowData.sa | number : '1.2-2'}} [VA]</td>
+        </tr>
+        <tr>
+          <td>Tensão</td>
+          <td>{{nowData.uarms | number : '1.2-2'}} [V]</td>
+        </tr>
+        <tr>
+          <td>Corrente</td>
+          <td>{{nowData.iarms | number : '1.2-2'}} [A]</td>
+        </tr>
+        <tr>
+          <td>Fator de Potência</td>
+          <td>{{nowData.pfa | number : '1.2-2'}}</td>
+        </tr>
+        <tr>
+          <td>Consumo</td>
+          <td>{{nowData.epa_c | number : '1.2-2'}} [kWh]</td>
+        </tr>
+        <tr>
+          <td>Geração</td>
+          <td>{{nowData.epa_g | number : '1.2-2'}} [kWh]</td>
+        </tr>
+      </table>
+    </p-accordionTab>
+    <p-accordionTab header="Fase B">
+      <table>
+        <tr>
+          <td>Potência Ativa</td>
+          <td>{{nowData.pb}} [W]</td>
+        </tr>
+        <tr>
+          <td>Potência Reativa</td>
+          <td>{{nowData.qb}} [VAr]</td>
+        </tr>
+        <tr>
+          <td>Potência Aparente</td>
+          <td>{{nowData.sb}} [VA]</td>
+        </tr>
+        <tr>
+          <td>Tensão</td>
+          <td>{{nowData.ubrms}} [V]</td>
+        </tr>
+        <tr>
+          <td>Corrente</td>
+          <td>{{nowData.ibrms}} [A]</td>
+        </tr>
+        <tr>
+          <td>Fator de Potência</td>
+          <td>{{nowData.pfb}}</td>
+        </tr>
+        <tr>
+          <td>Consumo</td>
+          <td>{{nowData.epb_c}} [kWh]</td>
+        </tr>
+        <tr>
+          <td>Geração</td>
+          <td>{{nowData.epb_g}} [kWh]</td>
+        </tr>
+      </table>
+    </p-accordionTab>
+    <p-accordionTab header="Fase C">
+      <table>
+        <tr>
+          <td>Potência Ativa</td>
+          <td>{{nowData.pc}} [W]</td>
+        </tr>
+        <tr>
+          <td>Potência Reativa</td>
+          <td>{{nowData.qc}} [VAr]</td>
+        </tr>
+        <tr>
+          <td>Potência Aparente</td>
+          <td>{{nowData.sc}} [VA]</td>
+        </tr>
+        <tr>
+          <td>Tensão</td>
+          <td>{{nowData.ucrms}} [V]</td>
+        </tr>
+        <tr>
+          <td>Corrente</td>
+          <td>{{nowData.icrms}} [A]</td>
+        </tr>
+        <tr>
+          <td>Fator de Potência</td>
+          <td>{{nowData.pfc}}</td>
+        </tr>
+        <tr>
+          <td>Consumo</td>
+          <td>{{nowData.epc_c}} [kWh]</td>
+        </tr>
+        <tr>
+          <td>Geração</td>
+          <td>{{nowData.epc_g}} [kWh]</td>
+        </tr>
+      </table>
+    </p-accordionTab>
+  </p-accordion>
+</p-card>

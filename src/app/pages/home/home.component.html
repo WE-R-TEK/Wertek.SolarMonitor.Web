@@ -1,0 +1,40 @@
+<p-card header="Medição de Energia">
+<table>
+  <tr>
+    <td>Consumo Hoje</td>
+    <td>{{consHoje | number : '1.2-2'}} kWh</td>
+  </tr>
+  <tr>
+    <td>Geração Hoje</td>
+    <td>{{gerHoje | number : '1.2-2'}} kWh</td>
+  </tr>
+  <tr>
+    <td>Cosumo Mês Atual</td>
+    <td>{{consMes | number : '1.2-2'}} kWh</td>
+  </tr>
+  <tr>
+    <td>Geração Mês Atual</td>
+    <td>{{gerMes | number : '1.2-2'}} kWh</td>
+  </tr>
+</table>
+</p-card>
+
+<p-card header="Potência Ativa [W]">
+  <p-chart type="line" [data]="chartPotenciaAtivaData" [options]="chartPotenciaAtivaOpt"></p-chart>
+</p-card>
+
+<p-card header="Corrente [A]">
+  <p-chart type="line" [data]="chartCorrenteData" [options]="chartPotenciaAtivaOpt"></p-chart>
+</p-card>
+
+<p-card header="Tensão [V]">
+  <p-chart type="line" [data]="chartTensaoData" [options]="chartPotenciaAtivaOpt"></p-chart>
+</p-card>
+
+<p-card header="Consumo de Energia [kWh]">
+  <p-chart type="line" [data]="chartConsumoData" [options]="chartPotenciaAtivaOpt"></p-chart>
+</p-card>
+
+<p-card header="Geração de Energia [kWh]">
+  <p-chart type="line" [data]="chartGeracaoData" [options]="chartPotenciaAtivaOpt"></p-chart>
+</p-card>
