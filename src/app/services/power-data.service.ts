@@ -299,4 +299,29 @@ export class PowerDataService {
     });
     return returnData;
   }
+
+  getLastData(): Observable<any> {
+    const returnData = new Observable((observer) => {
+      const fluxQuery = `from (bucket: "solarmonitor")
+      |> range(start: -15m)
+      |> filter(fn: (r) => r._measurement == "powerdata")
+      |> sort(columns: ["_time"])
+      |> last()
+      |> pivot(rowKey:["_time"], columnKey: ["_field"], valueColumn: "_value")`;
+
+      this.queryClient.queryRows(fluxQuery, {
+        next: (row, tableMeta) => {
+          const tableObject = tableMeta.toObject(row);
+          observer.next(tableObject);
+        },
+        error: (error) => {
+          observer.error(error);
+        },
+        complete: () => {
+          observer.complete();
+        },
+      });
+    });
+    return returnData;
+  }
 }
