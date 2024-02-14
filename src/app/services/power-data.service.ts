@@ -3,6 +3,7 @@ import { AngularFireDatabase, AngularFireList, AngularFireObject } from '@angula
 import { InfluxDB } from '@influxdata/influxdb-client';
 import moment from 'moment-timezone';
 import { Observable } from 'rxjs';
+import * as Highcharts from 'highcharts';
 
 @Injectable({
   providedIn: 'root'
@@ -49,13 +50,10 @@ export class PowerDataService {
   }
 
   getSumDataPath() {
-    console.log('getSumDataPath');
     const momentum = moment().tz('America/Sao_Paulo');
     const year = momentum.format('YYYY');
     const month = momentum.format('YYYY-MM');
     const day = momentum.format('YYYY-MM-DD');
-
-    console.log(`${this.allDataPath}/${year}/${month}/${day}/sum`)
 
     return `${this.allDataPath}/${year}/${month}/${day}/sum`;
   }
@@ -282,7 +280,6 @@ export class PowerDataService {
         union(tables: [first, last])
           |> difference()`;
 
-      console.log(fluxQuery);
 
       this.queryClient.queryRows(fluxQuery, {
         next: (row, tableMeta) => {
@@ -323,5 +320,79 @@ export class PowerDataService {
       });
     });
     return returnData;
+  }
+
+  getGaugeOptions(title: string, label: string, min: number, max: number, value: number): Highcharts.Options {
+    return {
+      chart: {
+        type: 'solidgauge',
+      },
+      title: {
+        text: title
+      },
+      pane: {
+        center: ['50%', '70%'],
+        size: '100%',
+        startAngle: -90,
+        endAngle: 90,
+        background: [{
+          backgroundColor: Highcharts.defaultOptions.legend?.backgroundColor || '#EEE',
+          innerRadius: '60%',
+          outerRadius: '100%',
+          shape: 'arc'
+        }],
+      },
+      exporting: {
+        enabled: false
+      },
+      tooltip: {
+        enabled: false
+      },
+      yAxis: {
+        stops: [
+          [0.1, '#55BF3B'],
+          [0.5, '#DDDF0D'],
+          [0.9, '#DF5353']
+        ],
+        lineWidth: 0,
+        tickWidth: 0,
+        minorTickInterval: 'auto',
+        tickAmount: 2,
+        title: {
+          y: -70
+        },
+        labels: {
+          y: 16
+        },
+        min: min,
+        max: max
+      },
+      plotOptions: {
+        solidgauge: {
+          dataLabels: {
+            y: 10,
+            borderWidth: 0,
+            useHTML: true
+          }
+        }
+      },
+      credits: {
+        enabled: false
+      },
+      series: [{
+        name: 'Potencia A',
+        data: [value],
+        type: 'solidgauge',
+        dataLabels: {
+          format: '<div style="text-align:center">' +
+          '<span style="font-size:16px">{y}</span><br/>' +
+          '<span style="font-size:10px;opacity:0.4">'+label+'</span>' +
+          '</div>'
+        },
+        tooltip: {
+          valueSuffix: label
+        }
+      }]
+    };
   }
 }

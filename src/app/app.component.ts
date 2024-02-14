@@ -10,34 +10,22 @@ import { PanelModule } from 'primeng/panel';
 import { AccordionModule } from 'primeng/accordion';
 import { PowerDataService } from './services/power-data.service';
 import { map } from 'rxjs';
+import { PrimeNGConfig } from 'primeng/api';
 
 @Component({
   selector: 'app-root',
   standalone: true,
   imports: [
-    CommonModule,
-    RouterOutlet,
-    ToolbarModule,
-    ButtonModule,
-    ChartModule,
-    CardModule,
-    TableModule,
-    PanelModule,
-    AccordionModule,
-    RouterModule
+    RouterOutlet
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.less'
 })
 export class AppComponent implements OnInit{
 
-  constructor(private powerDataService: PowerDataService) {}
+  constructor(private primengConfig: PrimeNGConfig) {}
 
   ngOnInit(): void {
-    this.resetAllData();
-  }
-
-  resetAllData() {
-    this.powerDataService.resetAllData();
+    this.primengConfig.ripple = true;
   }
 }
