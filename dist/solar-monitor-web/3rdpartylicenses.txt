@@ -1,5 +1,10 @@
 
 --------------------------------------------------------------------------------
+Package: highcharts
+License: "https://www.highcharts.com/license"
+
+
+--------------------------------------------------------------------------------
 Package: moment
 License: "MIT"
 
@@ -50,11 +55,6 @@ FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
 COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
 IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
---------------------------------------------------------------------------------
-Package: highcharts
-License: "https://www.highcharts.com/license"
-
-
 --------------------------------------------------------------------------------
 Package: @angular/core
 License: "MIT"
@@ -318,31 +318,6 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 --------------------------------------------------------------------------------
-Package: firebase
-License: "Apache-2.0"
-
-
---------------------------------------------------------------------------------
-Package: @angular/fire
-License: "MIT"
-
-
---------------------------------------------------------------------------------
-Package: @firebase/app-check
-License: "Apache-2.0"
-
-
---------------------------------------------------------------------------------
-Package: @firebase/database
-License: "Apache-2.0"
-
-
---------------------------------------------------------------------------------
-Package: @firebase/database-compat
-License: "Apache-2.0"
-
-
---------------------------------------------------------------------------------
 Package: socket.io-client
 License: "MIT"
 
@@ -578,6 +553,31 @@ IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
 CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
 TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+--------------------------------------------------------------------------------
+Package: firebase
+License: "Apache-2.0"
+
+
+--------------------------------------------------------------------------------
+Package: @angular/fire
+License: "MIT"
+
+
+--------------------------------------------------------------------------------
+Package: @firebase/app-check
+License: "Apache-2.0"
+
+
+--------------------------------------------------------------------------------
+Package: @firebase/database
+License: "Apache-2.0"
+
+
+--------------------------------------------------------------------------------
+Package: @firebase/database-compat
+License: "Apache-2.0"
+
 
 --------------------------------------------------------------------------------
 Package: @firebase/util
