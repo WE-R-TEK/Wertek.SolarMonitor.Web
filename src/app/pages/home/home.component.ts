@@ -5,11 +5,12 @@ import { CommonModule } from '@angular/common';
 import { ChartModule } from 'primeng/chart';
 import moment from 'moment-timezone';
 import 'chartjs-adapter-moment';
-import { WebSocketService } from '../../services/web-socket.service';
 import { CalendarModule } from 'primeng/calendar';
 import { FormsModule } from '@angular/forms';
 import { HighchartsChartModule } from 'highcharts-angular';
 import * as Highcharts from 'highcharts';
+import { Socket } from 'ngx-socket-io';
+import { Subscription, map } from 'rxjs';
 
 @Component({
   selector: 'app-home',
@@ -30,6 +31,7 @@ export class HomeComponent implements OnInit, OnDestroy{
   chartTensaoOptions: Highcharts.Options = {};
   chartConsumoOptions: Highcharts.Options = {};
   chartGeracaoOptions: Highcharts.Options = {};
+  wsSubscription: Subscription;
 
   get date(): Date {
     return this._date;
@@ -42,18 +44,20 @@ export class HomeComponent implements OnInit, OnDestroy{
 
   constructor(
     private powerDataService: PowerDataService,
-    private readonly websocketService: WebSocketService
-  ) {}
+    private readonly websocketService: Socket
+  ) {
+    this.wsSubscription = this.websocketService.fromEvent('events').pipe(map((receivedMessage: any) => {
+      console.log('Received message from websocket: ', receivedMessage);
+      this.updateData();
+     })).subscribe();
+  }
   ngOnDestroy(): void {
-    this.websocketService.disconnectSocket();
+    this.wsSubscription.unsubscribe();
   }
 
   ngOnInit(): void {
     this.updateData();
-    this.websocketService.connectSocket('events');
-    this.websocketService.receiveSocket().subscribe((receivedMessage: any) => {
-      this.updateData();
-     });
+
   }
 
   updateData() {

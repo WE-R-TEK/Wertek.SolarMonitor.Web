@@ -1,19 +1,19 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { MenuItem } from 'primeng/api';
 import { Product } from '../../services/api/product';
-import { Subscription, debounceTime } from 'rxjs';
+import { Subscription, debounceTime, map } from 'rxjs';
 import { LayoutService } from '../../services/app.layout.service';
 import { CommonModule } from '@angular/common';
 import { TableModule } from 'primeng/table';
 import { MenuModule } from 'primeng/menu';
 import { ChartModule } from 'primeng/chart';
-import { WebSocketService } from '../../services/web-socket.service';
 import moment from 'moment';
 import { PowerDataService } from '../../services/power-data.service';
 import { HighchartsChartModule } from 'highcharts-angular';
 import * as Highcharts from 'highcharts';
 import HighchartsMore from 'highcharts/highcharts-more';
 import HighchartsSolidGauge from 'highcharts/modules/solid-gauge';
+import { Socket } from 'ngx-socket-io';
 HighchartsMore(Highcharts);
 HighchartsSolidGauge(Highcharts);
 
@@ -43,6 +43,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   chartTensaoCOptions: Highcharts.Options = {};
   chartConsumoOptions: Highcharts.Options = {};
   chartGeracaoOptions: Highcharts.Options = {};
+  wsSubscription: Subscription;
 
   items!: MenuItem[];
 
@@ -56,27 +57,28 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
     constructor(
       public layoutService: LayoutService,
-      private readonly websocketService: WebSocketService,
+      private readonly websocketService: Socket,
       private readonly powerDataService: PowerDataService
     ) {
         this.subscription = this.layoutService.configUpdate$
         .pipe(debounceTime(25))
         .subscribe((config) => {
         });
+        this.wsSubscription = this.websocketService.fromEvent('events').pipe(map((receivedMessage: any) => {
+          console.log('Received message from websocket: ', receivedMessage);
+          this.retrieveSumData();
+          this.retieveNowData();
+          this.retrieveConsumoData();
+          this.retrieveGeracaoData();
+        })).subscribe();
     }
 
     ngOnInit() {
-      this.websocketService.connectSocket('events');
       this.retrieveSumData();
       this.retieveNowData();
       this.retrieveConsumoData();
       this.retrieveGeracaoData();
-      this.websocketService.receiveSocket().subscribe((receivedMessage: any) => {
-        this.retrieveSumData();
-        this.retieveNowData();
-        this.retrieveConsumoData();
-        this.retrieveGeracaoData();
-      });
+
     }
 
     retrieveConsumoData() {
@@ -132,6 +134,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
     }
 
     ngOnDestroy() {
-        this.websocketService.disconnectSocket();
+      this.wsSubscription.unsubscribe();
     }
 }

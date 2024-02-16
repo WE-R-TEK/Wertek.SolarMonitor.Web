@@ -13,14 +13,18 @@ import { provideAuth } from '@angular/fire/auth';
 import { getAuth } from 'firebase/auth';
 import { provideFirebaseApp } from '@angular/fire/app';
 import { initializeApp } from 'firebase/app';
+import { SocketIoConfig, SocketIoModule } from 'ngx-socket-io';
 
 registerLocaleData(localePt);
+
+const socketConfig: SocketIoConfig = { url: 'http://52.40.160.15:3000', options: {}};
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideRouter(routes),
     importProvidersFrom(provideFirebaseApp(() => initializeApp(environment.firebase))),
     importProvidersFrom(provideAuth(() => getAuth())),
+    importProvidersFrom(SocketIoModule.forRoot(socketConfig)),
     provideAnimations(),
     provideHttpClient(),
     {provide: LOCALE_ID, useValue: 'pt' },
