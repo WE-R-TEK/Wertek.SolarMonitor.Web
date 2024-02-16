@@ -1,40 +1,117 @@
-<p-card header="Medição de Energia">
-<table>
-  <tr>
-    <td>Consumo Hoje</td>
-    <td>{{consHoje | number : '1.2-2'}} kWh</td>
-  </tr>
-  <tr>
-    <td>Geração Hoje</td>
-    <td>{{gerHoje | number : '1.2-2'}} kWh</td>
-  </tr>
-  <tr>
-    <td>Cosumo Mês Atual</td>
-    <td>{{consMes | number : '1.2-2'}} kWh</td>
-  </tr>
-  <tr>
-    <td>Geração Mês Atual</td>
-    <td>{{gerMes | number : '1.2-2'}} kWh</td>
-  </tr>
-</table>
-</p-card>
-
-<p-card header="Potência Ativa [W]">
-  <p-chart type="line" [data]="chartPotenciaAtivaData" [options]="chartPotenciaAtivaOpt"></p-chart>
-</p-card>
-
-<p-card header="Corrente [A]">
-  <p-chart type="line" [data]="chartCorrenteData" [options]="chartPotenciaAtivaOpt"></p-chart>
-</p-card>
-
-<p-card header="Tensão [V]">
-  <p-chart type="line" [data]="chartTensaoData" [options]="chartPotenciaAtivaOpt"></p-chart>
-</p-card>
-
-<p-card header="Consumo de Energia [kWh]">
-  <p-chart type="line" [data]="chartConsumoData" [options]="chartPotenciaAtivaOpt"></p-chart>
-</p-card>
-
-<p-card header="Geração de Energia [kWh]">
-  <p-chart type="line" [data]="chartGeracaoData" [options]="chartPotenciaAtivaOpt"></p-chart>
-</p-card>
+<div class="grid">
+  <div class="col-12 lg:col-12 xl:col-12">
+    <div class="card mb-0">
+      <p-calendar [(ngModel)]="date" [touchUI]="true" [readonlyInput]="true" [showIcon]="true" inputId="icon" dateFormat="dd/mm/yy"></p-calendar>
+    </div>
+  </div>
+  <div class="col-12 lg:col-6 xl:col-3">
+    <div class="card mb-0">
+        <div class="flex justify-content-between mb-3">
+            <div>
+                <span class="block text-500 font-medium mb-3">Consumo Hoje</span>
+                <div class="text-900 font-medium text-xl">{{consHoje | number:'1.2-2':'pt'}} kWh - R$ {{(consHoje * 0.86668247) | number:'1.2-2':'pt'}}</div>
+            </div>
+            <div class="flex align-items-center justify-content-center bg-red-100 border-round" [ngStyle]="{width: '2.5rem', height: '2.5rem'}">
+                <i class="pi pi-thumbs-down-fill text-red-500 text-xl"></i>
+            </div>
+        </div>
+        <span class="font-medium" [ngClass]="consHoje > gerHoje ? 'text-red-500' : 'text-green-500'">{{consHoje > gerHoje ? (consHoje - gerHoje | number:'1.2-2':'pt') + 'kWh - R$ ' + ((consHoje - gerHoje) * 0.86668247 | number:'1.2-2':'pt') : 'crédito'}} </span>
+        <span class="text-500">no consumo</span>
+    </div>
+  </div>
+  <div class="col-12 lg:col-6 xl:col-3">
+    <div class="card mb-0">
+        <div class="flex justify-content-between mb-3">
+            <div>
+                <span class="block text-500 font-medium mb-3">Geração Hoje (Crédito)</span>
+                <div class="text-900 font-medium text-xl">{{gerHoje | number:'1.2-2':'pt'}} kWh - R$ {{(gerHoje * 0.72991046) | number:'1.2-2':'pt'}}</div>
+            </div>
+            <div class="flex align-items-center justify-content-center bg-green-100 border-round" [ngStyle]="{width: '2.5rem', height: '2.5rem'}">
+                <i class="pi pi-thumbs-up-fill text-green-500 text-xl"></i>
+            </div>
+        </div>
+        <span class="font-medium" [ngClass]="consHoje > gerHoje ? 'text-red-500' : 'text-green-500'">{{consHoje > gerHoje ? 'débito' : ( gerHoje - consHoje | number:'1.2-2':'pt') + 'kWh - R$ ' + ( (gerHoje - consHoje) * 0.72991046 | number:'1.2-2':'pt') }} </span>
+        <span class="text-500">na geração</span>
+    </div>
+  </div>
+  <div class="col-12 lg:col-6 xl:col-3">
+    <div class="card mb-0">
+        <div class="flex justify-content-between mb-3">
+            <div>
+                <span class="block text-500 font-medium mb-3">Cosumo Mês Atual</span>
+                <div class="text-900 font-medium text-xl">{{consMes | number:'1.2-2':'pt'}} kWh - R$ {{(consMes * 0.86668247) | number:'1.2-2':'pt'}}</div>
+            </div>
+            <div class="flex align-items-center justify-content-center bg-orange-100 border-round" [ngStyle]="{width: '2.5rem', height: '2.5rem'}">
+                <i class="pi pi-thumbs-down text-orange-500 text-xl"></i>
+            </div>
+        </div>
+        <span class="font-medium" [ngClass]="consMes > gerMes ? 'text-red-500' : 'text-green-500'">{{consMes > gerMes ? (consMes - gerMes | number:'1.2-2':'pt') + 'kWh - R$ ' + ((consMes - gerMes) * 0.86668247 | number:'1.2-2':'pt') : 'crédito'}} </span>
+        <span class="text-500">no consumo</span>
+    </div>
+  </div>
+  <div class="col-12 lg:col-6 xl:col-3">
+    <div class="card mb-0">
+        <div class="flex justify-content-between mb-3">
+            <div>
+                <span class="block text-500 font-medium mb-3">Geração Mês Atual (Crédito)</span>
+                <div class="text-900 font-medium text-xl">{{gerMes | number:'1.2-2':'pt'}} kWh - R$ {{(gerMes * 0.72991046) | number:'1.2-2':'pt'}}</div>
+            </div>
+            <div class="flex align-items-center justify-content-center bg-blue-100 border-round" [ngStyle]="{width: '2.5rem', height: '2.5rem'}">
+                <i class="pi pi-thumbs-up text-blue-500 text-xl"></i>
+            </div>
+        </div>
+        <span class="font-medium" [ngClass]="consMes > gerMes ? 'text-red-500' : 'text-green-500'">{{consMes > gerMes ? 'débito' : ( gerMes - consMes | number:'1.2-2':'pt') + 'kWh - R$ ' + ( (gerMes - consMes) * 0.72991046 | number:'1.2-2':'pt') }} </span>
+        <span class="text-500">na geração</span>
+    </div>
+  </div>
+</div>
+<div class="col-12 xl:col-12">
+  <div class="card">
+      <highcharts-chart
+        [Highcharts]="Highcharts"
+        [options]="chartPotenciaAtivaOptions"
+        [oneToOne]="true"
+        style="width: 100%; height: 400px; display: block;"
+      ></highcharts-chart>
+  </div>
+</div>
+<div class="col-12 xl:col-12">
+  <div class="card">
+      <highcharts-chart
+        [Highcharts]="Highcharts"
+        [options]="chartCorrenteOptions"
+        [oneToOne]="true"
+        style="width: 100%; height: 400px; display: block;"
+      ></highcharts-chart>
+  </div>
+</div>
+<div class="col-12 xl:col-12">
+  <div class="card">
+      <highcharts-chart
+        [Highcharts]="Highcharts"
+        [options]="chartTensaoOptions"
+        [oneToOne]="true"
+        style="width: 100%; height: 400px; display: block;"
+      ></highcharts-chart>
+  </div>
+</div>
+<div class="col-12 xl:col-12">
+  <div class="card">
+      <highcharts-chart
+        [Highcharts]="Highcharts"
+        [options]="chartConsumoOptions"
+        [oneToOne]="true"
+        style="width: 100%; height: 400px; display: block;"
+      ></highcharts-chart>
+  </div>
+</div>
+<div class="col-12 xl:col-12">
+  <div class="card">
+      <highcharts-chart
+        [Highcharts]="Highcharts"
+        [options]="chartGeracaoOptions"
+        [oneToOne]="true"
+        style="width: 100%; height: 400px; display: block;"
+      ></highcharts-chart>
+  </div>
+</div>

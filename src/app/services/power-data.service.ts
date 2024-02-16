@@ -379,4 +379,43 @@ export class PowerDataService {
       },
     };
   }
+
+  getChartLineOptions(title: string, label: string, data: {title: string, color: string, values: any[]}[]): Highcharts.Options {
+    return {
+      chart: {
+        type: 'line'
+      },
+      title: {
+        text: title
+      },
+      yAxis: {
+        title: {
+          text: label
+        }
+      },
+      xAxis: {
+        type: 'datetime',
+        title: {
+          text: 'Hora'
+        },
+        labels: {
+          format: '{value:%H:%M}'
+        }
+      },
+      time: {
+        timezone: 'America/Sao_Paulo'
+      },
+      series: data.map((d) => {
+        return {
+          data: d.values,
+          type: 'line',
+          color: d.color,
+          name: d.title
+        };
+      }),
+      legend: {
+        enabled: true
+      },
+    };
+  }
 }
