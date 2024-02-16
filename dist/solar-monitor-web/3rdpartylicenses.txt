@@ -529,7 +529,7 @@ License: "MIT"
 
 
 --------------------------------------------------------------------------------
-Package: @firebase/app-check
+Package: rxfire
 License: "Apache-2.0"
 
 

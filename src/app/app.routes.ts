@@ -4,14 +4,16 @@ import { HomeComponent } from './pages/home/home.component';
 import { AppLayoutComponent } from './layout/app.layout/app.layout.component';
 import { DashboardComponent } from './pages/dashboard/dashboard.component';
 import { LoginComponent } from './pages/login/login.component';
-import { userLoggedInGuard } from './services/guards/user-logged-in.guard';
-import { userNotLoggedInGuard } from './services/guards/user-not-logged-in.guard';
+import { redirectUnauthorizedTo, redirectLoggedInTo, AuthGuard } from '@angular/fire/auth-guard';
+
+const redirectUnauthorizedToLogin = () => redirectUnauthorizedTo(['login']);
+const redirectLoggedInToHome = () => redirectLoggedInTo(['']);
 
 export const routes: Routes = [
-  { path: '', component: AppLayoutComponent, canActivate: [userLoggedInGuard], children: [
+  { path: '', component: AppLayoutComponent, canActivate: [AuthGuard], data: {authGuardPipe: redirectUnauthorizedToLogin}, children: [
     { path: '', component: DashboardComponent },
     { path: 'home', component: HomeComponent},
     { path: 'grandezas-eletricas', component: GrandezasEletricaComponent },
   ] },
-  { path: 'login', component: LoginComponent, canActivate: [userNotLoggedInGuard]}
+  { path: 'login', component: LoginComponent, canActivate: [AuthGuard], data: {authGuardPipe: redirectLoggedInToHome} },
 ];

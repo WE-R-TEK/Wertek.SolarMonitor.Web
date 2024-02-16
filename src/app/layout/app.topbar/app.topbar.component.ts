@@ -1,10 +1,11 @@
-import { Component, ElementRef, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnDestroy, ViewChild, inject } from '@angular/core';
 import { MenuItem } from 'primeng/api';
 import { LayoutService } from '../../services/app.layout.service';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { MenuModule } from 'primeng/menu';
-import { AuthService } from '../../services/auth.service';
+import { Auth, User, authState } from '@angular/fire/auth';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-topbar',
@@ -13,16 +14,12 @@ import { AuthService } from '../../services/auth.service';
   templateUrl: './app.topbar.component.html',
   styleUrl: './app.topbar.component.less'
 })
-export class AppTopbarComponent {
+export class AppTopbarComponent implements OnDestroy {
+  private auth: Auth = inject(Auth);
+  authState$ = authState(this.auth);
+  authStateSubscription: Subscription;
   items!: MenuItem[];
-  itemsmu: MenuItem[] = [
-    {
-      label: 'Sair',
-      command: () => {
-        this.authService.logout();
-      }
-    }
-  ];
+  itemsmu: MenuItem[] = [];
 
   @ViewChild('menubutton') menuButton!: ElementRef;
 
@@ -32,6 +29,28 @@ export class AppTopbarComponent {
 
   constructor(
     public layoutService: LayoutService,
-    private readonly authService: AuthService,
-  ) { }
+    private readonly router: Router
+  ) {
+    this.authStateSubscription = this.authState$.subscribe((aUser: User | null) => {
+      this.itemsmu = [
+        {
+          label: aUser?.displayName ?? '',
+          items:[
+            {
+              label: 'Sair',
+              command: () => {
+                this.auth.signOut();
+                this.router.navigate(['login']);
+              }
+            }
+
+          ]
+        }
+      ]
+    });
+  }
+
+  ngOnDestroy() {
+    this.authStateSubscription.unsubscribe();
+  }
 }

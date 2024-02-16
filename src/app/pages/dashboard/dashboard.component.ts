@@ -100,7 +100,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
         this.chartPotenciaAOptions = this.powerDataService.getGaugeOptions('Potência A', 'W', -2000, 2000, data.pa);
         this.chartPotenciaBOptions = this.powerDataService.getGaugeOptions('Potência B', 'W', -2000, 2000, data.pb);
         this.chartPotenciaCOptions = this.powerDataService.getGaugeOptions('Potência C', 'W', -2000, 2000, data.pc);
-        this.chartPotenciaTOptions = this.powerDataService.getGaugeOptions('Potência Total', 'W', -2000, 2000, data.pt);
+        this.chartPotenciaTOptions = this.powerDataService.getGaugeOptions('Potência Total', 'W', -3000, 3000, data.pt);
         this.chartCorrenteAOptions = this.powerDataService.getGaugeOptions('Corrente A', 'A', 0, 100, data.iarms);
         this.chartCorrenteBOptions = this.powerDataService.getGaugeOptions('Corrente B', 'A', 0, 100, data.ibrms);
         this.chartCorrenteCOptions = this.powerDataService.getGaugeOptions('Corrente C', 'A', 0, 100, data.icrms);

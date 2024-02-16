@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { LayoutService } from '../../services/app.layout.service';
 import { PasswordModule } from 'primeng/password';
 import { CommonModule } from '@angular/common';
@@ -6,7 +6,7 @@ import { FormsModule } from '@angular/forms';
 import { CheckboxModule } from 'primeng/checkbox';
 import { Router, RouterModule } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
-import { AuthService } from '../../services/auth.service';
+import { Auth, signInWithEmailAndPassword } from '@angular/fire/auth';
 
 @Component({
   selector: 'app-login',
@@ -26,6 +26,7 @@ import { AuthService } from '../../services/auth.service';
   ]
 })
 export class LoginComponent {
+  private auth: Auth = inject(Auth);
   valCheck: string[] = ['remember'];
 
   password!: string;
@@ -33,12 +34,13 @@ export class LoginComponent {
 
   constructor(
     public layoutService: LayoutService,
-    private readonly authService: AuthService,
     private readonly router: Router
   )
    { }
 
   signIn() {
-    this.authService.login(this.email, this.password);
+    signInWithEmailAndPassword(this.auth, this.email, this.password).then(() => {
+      this.router.navigate(['']);
+    });
   }
 }
