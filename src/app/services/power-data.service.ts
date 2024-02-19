@@ -165,7 +165,7 @@ export class PowerDataService {
     return returnData;
   }
 
-  getGeracaoData(start: string, end: string): Observable<any> {
+  getInjetadaData(start: string, end: string): Observable<any> {
     const returnData = new Observable((observer) => {
       const fluxQuery = `base = () =>
       from(bucket: "solarmonitor")
@@ -214,6 +214,49 @@ export class PowerDataService {
     return returnData;
   }
 
+  getGeracaoData(start: string, end: string): Observable<any> {
+    const returnData = new Observable((observer) => {
+      const fluxQuery = `base = () =>
+      from(bucket: "solarmonitor")
+        |> range(start: ${start}, stop: ${end})
+        |> filter(fn: (r) => r._measurement == "solardata")
+        |> filter(fn: (r) => r._field == "total")
+
+
+      first = base()
+        |> sort(columns: ["_time"])
+        |> first()
+        |> pivot(rowKey:["_time"], columnKey: ["_field"], valueColumn: "_value")
+        |> tableFind(fn: (key) => true)
+        |> getRecord(idx: 0)
+
+      base()
+        |> aggregateWindow(every: 5m, fn: max)
+        |> pivot(rowKey:["_time"], columnKey: ["_field"], valueColumn: "_value")
+        |> map(fn: (r) => ({r with
+          total: r.total - first.total
+        }))
+        |> sort(columns: ["_time"])`;
+
+      const data:any[] = [];
+
+      this.queryClient.queryRows(fluxQuery, {
+        next: (row, tableMeta) => {
+          const tableObject = tableMeta.toObject(row);
+          data.push(tableObject);
+        },
+        error: (error) => {
+          observer.error(error);
+        },
+        complete: () => {
+          observer.next(data);
+          observer.complete();
+        },
+      });
+    });
+    return returnData;
+  }
+
   getDifferenceDataPeriod(start: string, end: string, field: string): Observable<any> {
     const returnData = new Observable((observer) => {
       const fluxQuery = `data = () => from(bucket: "solarmonitor")
@@ -225,6 +268,35 @@ export class PowerDataService {
 
         union(tables: [first, last])
           |> difference()`;
+
+
+      this.queryClient.queryRows(fluxQuery, {
+        next: (row, tableMeta) => {
+          const tableObject = tableMeta.toObject(row);
+          observer.next(tableObject['_value']);
+        },
+        error: (error) => {
+          observer.error(error);
+        },
+        complete: () => {
+          observer.complete();
+        },
+      });
+    });
+    return returnData;
+  }
+
+  getGeradoTotalPeriod(start: string, end: string): Observable<any> {
+    const returnData = new Observable((observer) => {
+      const fluxQuery = `data = () => from(bucket: "solarmonitor")
+      |> range(start: ${start}, stop: ${end})
+      |> filter(fn: (r) => r._measurement == "solardata" and r._field == "total")
+
+      first = data() |> first()
+      last = data() |> last()
+
+      union(tables: [first, last])
+        |> difference()`;
 
 
       this.queryClient.queryRows(fluxQuery, {

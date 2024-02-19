@@ -21,9 +21,11 @@ import { Subscription, map } from 'rxjs';
 })
 export class HomeComponent implements OnInit, OnDestroy{
   consHoje = 0;
-  gerHoje = 0;
-  consMes = 0;
+  injHoje = 0;
   gerMes = 0;
+  consMes = 0;
+  injMes = 0;
+  gerHoje = 0;
   private _date: Date = new Date();
   Highcharts = Highcharts;
   chartPotenciaAtivaOptions: Highcharts.Options = {};
@@ -63,7 +65,7 @@ export class HomeComponent implements OnInit, OnDestroy{
   updateData() {
     this.retrieveSumData();
     this.retrieveConsumoData();
-    this.retrieveGeracaoData();
+    this.retrieveInjetadaData();
     this.retrievePotenciaAtivaData();
     this.retrieveCorrenteData();
     this.retrieveTensaoData();
@@ -124,11 +126,11 @@ export class HomeComponent implements OnInit, OnDestroy{
     });
   }
 
-  retrieveGeracaoData() {
+  retrieveInjetadaData() {
     const startDay = moment(this._date).startOf('day').utc().toISOString();
     const endDay = moment(this._date).endOf('day').utc().toISOString();
-    this.powerDataService.getGeracaoData(startDay, endDay).subscribe((data: any) => {
-      this.chartGeracaoOptions = this.powerDataService.getChartLineOptions('Geração de Energia [kWh]', 'kWh', [
+    this.powerDataService.getInjetadaData(startDay, endDay).subscribe((data: any) => {
+      this.chartGeracaoOptions = this.powerDataService.getChartLineOptions('Energia Injetada (Geração) [kWh]', 'kWh', [
           {title: 'Fase A', color: 'darkblue', values: data.map((d: any) => [moment.utc(d._time).valueOf(), d.epa_g])},
           {title: 'Fase B', color: 'darkgreen', values: data.map((d: any) => [moment.utc(d._time).valueOf(), d.epb_g])},
           {title: 'Fase C', color: 'darkred', values: data.map((d: any) => [moment.utc(d._time).valueOf(), d.epc_g])},
@@ -148,12 +150,18 @@ export class HomeComponent implements OnInit, OnDestroy{
       this.consHoje = data;
     });
     this.powerDataService.getDifferenceDataPeriod(startDay, endDay, 'ept_g').subscribe((data: any) => {
-      this.gerHoje = data;
+      this.injHoje = data;
     });
     this.powerDataService.getDifferenceDataPeriod(startMonth, endMonth, 'ept_c').subscribe((data: any) => {
       this.consMes = data;
     });
     this.powerDataService.getDifferenceDataPeriod(startMonth, endMonth, 'ept_g').subscribe((data: any) => {
+      this.injMes = data;
+    });
+    this.powerDataService.getGeradoTotalPeriod(startDay, endDay).subscribe((data: any) => {
+      this.gerHoje = data;
+    });
+    this.powerDataService.getGeradoTotalPeriod(startMonth, endMonth).subscribe((data: any) => {
       this.gerMes = data;
     });
   }

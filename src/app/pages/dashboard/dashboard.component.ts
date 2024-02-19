@@ -26,9 +26,11 @@ HighchartsSolidGauge(Highcharts);
 })
 export class DashboardComponent implements OnInit, OnDestroy {
   consHoje = 0;
-  gerHoje = 0;
-  consMes = 0;
+  injHoje = 0;
   gerMes = 0;
+  consMes = 0;
+  injMes = 0;
+  gerHoje = 0;
   Highcharts = Highcharts;
   chartPotenciaAOptions: Highcharts.Options = {};
   chartPotenciaBOptions: Highcharts.Options = {};
@@ -42,6 +44,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   chartTensaoBOptions: Highcharts.Options = {};
   chartTensaoCOptions: Highcharts.Options = {};
   chartConsumoOptions: Highcharts.Options = {};
+  chartInjetadaOptions: Highcharts.Options = {};
   chartGeracaoOptions: Highcharts.Options = {};
   wsSubscription: Subscription;
 
@@ -69,6 +72,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
           this.retrieveSumData();
           this.retieveNowData();
           this.retrieveConsumoData();
+          this.retrieveInjetadaData();
           this.retrieveGeracaoData();
         })).subscribe();
     }
@@ -77,8 +81,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
       this.retrieveSumData();
       this.retieveNowData();
       this.retrieveConsumoData();
+      this.retrieveInjetadaData();
       this.retrieveGeracaoData();
-
     }
 
     retrieveConsumoData() {
@@ -89,11 +93,19 @@ export class DashboardComponent implements OnInit, OnDestroy {
       });
     }
 
+    retrieveInjetadaData() {
+      const startDay = moment.tz('America/Sao_Paulo').startOf('day').utc().toISOString();
+      const endDay = moment.tz('America/Sao_Paulo').utc().toISOString();
+      this.powerDataService.getInjetadaData(startDay, endDay).subscribe((data: any) => {
+        this.chartInjetadaOptions = this.powerDataService.getChartAreaOptions('Energia Injetada (Geração) [kWh]', 'kWh', 'darkgreen', data.map((d: any) => [moment.utc(d._time).valueOf(), d.ept_g]));
+      });
+    }
+
     retrieveGeracaoData() {
       const startDay = moment.tz('America/Sao_Paulo').startOf('day').utc().toISOString();
       const endDay = moment.tz('America/Sao_Paulo').utc().toISOString();
       this.powerDataService.getGeracaoData(startDay, endDay).subscribe((data: any) => {
-        this.chartGeracaoOptions = this.powerDataService.getChartAreaOptions('Geração de Energia [kWh]', 'kWh', 'darkgreen', data.map((d: any) => [moment.utc(d._time).valueOf(), d.ept_g]));
+        this.chartGeracaoOptions = this.powerDataService.getChartAreaOptions('Energia Gerada [kWh]', 'kWh', 'darkblue', data.map((d: any) => [moment.utc(d._time).valueOf(), d.total]));
       });
     }
 
@@ -123,12 +135,18 @@ export class DashboardComponent implements OnInit, OnDestroy {
         this.consHoje = data;
       });
       this.powerDataService.getDifferenceDataPeriod(startDay, endDay, 'ept_g').subscribe((data: any) => {
-        this.gerHoje = data;
+        this.injHoje = data;
       });
       this.powerDataService.getDifferenceDataPeriod(startMonth, endMonth, 'ept_c').subscribe((data: any) => {
         this.consMes = data;
       });
       this.powerDataService.getDifferenceDataPeriod(startMonth, endMonth, 'ept_g').subscribe((data: any) => {
+        this.injMes = data;
+      });
+      this.powerDataService.getGeradoTotalPeriod(startDay, endDay).subscribe((data: any) => {
+        this.gerHoje = data;
+      });
+      this.powerDataService.getGeradoTotalPeriod(startMonth, endMonth).subscribe((data: any) => {
         this.gerMes = data;
       });
     }
