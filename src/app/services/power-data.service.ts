@@ -9,7 +9,7 @@ import * as Highcharts from 'highcharts';
 })
 export class PowerDataService {
 
-  private readonly url = 'http://52.40.160.15:8086';
+  private readonly url = 'http://54.68.63.227:8086';
   private readonly token = 'ZgzULOOA4gARxR7mxs3qGEwpC_rUzZkunLaxPTcA6iTl1yWpu0Mob_CYxHKLCAFqUyZE8WfcjAnY9c73St_9Kg==';
   private readonly org = 'wertek';
 
@@ -30,7 +30,9 @@ export class PowerDataService {
         r._field == "pb" or
         r._field == "pc" or
         r._field == "pt")
+      |> fill(column: "_value", value: 0.0)
       |> aggregateWindow(every: 5m, fn: mean)
+      |> fill(column: "_value", value: 0.0)
       |> pivot(rowKey:["_time"], columnKey: ["_field"], valueColumn: "_value")
       |> sort(columns: ["_time"])`;
 
@@ -62,7 +64,9 @@ export class PowerDataService {
         r._field == "ibrms" or
         r._field == "icrms" or
         r._field == "itrms")
+      |> fill(column: "_value", value: 0.0)
       |> aggregateWindow(every: 5m, fn: mean)
+      |> fill(column: "_value", value: 0.0)
       |> pivot(rowKey:["_time"], columnKey: ["_field"], valueColumn: "_value")
       |> sort(columns: ["_time"])`;
 
@@ -93,7 +97,9 @@ export class PowerDataService {
         |> filter(fn: (r) => r._field == "uarms" or
         r._field == "ubrms" or
         r._field == "ucrms")
+      |> fill(column: "_value", value: 0.0)
       |> aggregateWindow(every: 5m, fn: mean)
+      |> fill(column: "_value", value: 0.0)
       |> pivot(rowKey:["_time"], columnKey: ["_field"], valueColumn: "_value")
       |> sort(columns: ["_time"])`;
 
@@ -136,7 +142,9 @@ export class PowerDataService {
         |> getRecord(idx: 0)
 
       base()
+        |> fill(usePrevious: true)
         |> aggregateWindow(every: 5m, fn: max)
+        |> fill(usePrevious: true)
         |> pivot(rowKey:["_time"], columnKey: ["_field"], valueColumn: "_value")
         |> map(fn: (r) => ({r with
           epa_c: r.epa_c - first.epa_c,
@@ -185,7 +193,9 @@ export class PowerDataService {
         |> getRecord(idx: 0)
 
       base()
+        |> fill(usePrevious: true)
         |> aggregateWindow(every: 5m, fn: max)
+        |> fill(usePrevious: true)
         |> pivot(rowKey:["_time"], columnKey: ["_field"], valueColumn: "_value")
         |> map(fn: (r) => ({r with
           epa_g: r.epa_g - first.epa_g,
@@ -231,7 +241,9 @@ export class PowerDataService {
         |> getRecord(idx: 0)
 
       base()
+        |> fill(usePrevious: true)
         |> aggregateWindow(every: 5m, fn: max)
+        |> fill(usePrevious: true)
         |> pivot(rowKey:["_time"], columnKey: ["_field"], valueColumn: "_value")
         |> map(fn: (r) => ({r with
           total: r.total - first.total

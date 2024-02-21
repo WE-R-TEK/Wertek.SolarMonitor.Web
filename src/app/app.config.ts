@@ -17,7 +17,7 @@ import { SocketIoConfig, SocketIoModule } from 'ngx-socket-io';
 
 registerLocaleData(localePt);
 
-const socketConfig: SocketIoConfig = { url: 'http://52.40.160.15:3000', options: {}};
+const socketConfig: SocketIoConfig = { url: 'http://54.68.63.227:3000', options: {}};
 
 export const appConfig: ApplicationConfig = {
   providers: [
