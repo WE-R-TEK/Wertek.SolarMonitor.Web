@@ -1,4 +1,4 @@
-import { ApplicationConfig, LOCALE_ID, importProvidersFrom } from '@angular/core';
+import { ApplicationConfig, LOCALE_ID, importProvidersFrom, isDevMode } from '@angular/core';
 import { provideRouter } from '@angular/router';
 
 import { routes } from './app.routes';
@@ -14,10 +14,11 @@ import { getAuth } from 'firebase/auth';
 import { provideFirebaseApp } from '@angular/fire/app';
 import { initializeApp } from 'firebase/app';
 import { SocketIoConfig, SocketIoModule } from 'ngx-socket-io';
+import { provideServiceWorker } from '@angular/service-worker';
 
 registerLocaleData(localePt);
 
-const socketConfig: SocketIoConfig = { url: 'http://54.68.63.227:3000', options: {}};
+const socketConfig: SocketIoConfig = { url: 'https://api-power.we-rtek.com', options: {}};
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -27,7 +28,11 @@ export const appConfig: ApplicationConfig = {
     importProvidersFrom(SocketIoModule.forRoot(socketConfig)),
     provideAnimations(),
     provideHttpClient(),
-    {provide: LOCALE_ID, useValue: 'pt' },
-    {provide: PERSISTENCE, useValue: 'session'}
-  ]
+    { provide: LOCALE_ID, useValue: 'pt' },
+    { provide: PERSISTENCE, useValue: 'session' },
+    provideServiceWorker('ngsw-worker.js', {
+        enabled: !isDevMode(),
+        registrationStrategy: 'registerWhenStable:30000'
+    })
+]
 };

@@ -9,7 +9,7 @@ import * as Highcharts from 'highcharts';
 })
 export class PowerDataService {
 
-  private readonly url = 'http://54.68.63.227:8086';
+  private readonly url = 'https://influx-power.we-rtek.com';
   private readonly token = 'ZgzULOOA4gARxR7mxs3qGEwpC_rUzZkunLaxPTcA6iTl1yWpu0Mob_CYxHKLCAFqUyZE8WfcjAnY9c73St_9Kg==';
   private readonly org = 'wertek';
 
