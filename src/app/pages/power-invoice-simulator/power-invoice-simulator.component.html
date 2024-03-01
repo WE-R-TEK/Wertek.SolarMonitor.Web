@@ -17,7 +17,7 @@
         </div>
       </p-fieldset>
       <p-fieldset legend="Resultado de {{startDateShow | date: 'dd/MM/yyyy'}} até {{endDateShow | date: 'dd/MM/yyyy'}}" styleClass="mt-4">
-        <p-table [value]="simulationData" [tableStyle]="{'min-width': '50rem'}">
+        <p-table [value]="simulationData" responsiveLayout="stack" [breakpoint]="'600px'">
           <ng-template pTemplate="header" let-columns>
             <tr>
               <th>Descrição</th>
@@ -28,17 +28,17 @@
           </ng-template>
           <ng-template pTemplate="body" let-data>
             <tr>
-              <td>{{data.description}}</td>
-              <td>{{data.quantity | number:'1.2-2':'pt'}}</td>
-              <td>{{data.rate | number:'1.2-8':'pt'}}</td>
-              <td>{{data.value | number:'1.2-2':'pt'}}</td>
+              <td><span class="p-column-title">Name</span>{{data.description}}</td>
+              <td><span class="p-column-title">Quantidade kWh</span>{{data.quantity | number:'1.2-2':'pt'}}</td>
+              <td><span class="p-column-title">Tarifa R$</span>{{data.rate | number:'1.2-8':'pt'}}</td>
+              <td><span class="p-column-title">Valor R$</span>{{data.value | number:'1.2-2':'pt'}}</td>
             </tr>
           </ng-template>
-          <ng-template pTemplate="footer">
-            <tr>
-              <td colspan="3" style="text-align: right">Total</td>
-              <td>{{total | number:'1.2-2':'pt'}}</td>
-            </tr>
+          <ng-template pTemplate="summary" class="hidden">
+            <div class="flex flex-row justify-content-between md:justify-content-end">
+              <p class="md:mr-5">Valor total da fatura</p>
+              <p class="md:mr-5">R$ {{total | number:'1.2-2':'pt'}}</p>
+            </div>
           </ng-template>
         </p-table>
       </p-fieldset>
