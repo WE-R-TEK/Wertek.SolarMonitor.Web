@@ -1,0 +1,34 @@
+<div class="grid">
+  <div class="col-12 lg:col-12 xl:col-12">
+    <div class="card">
+      <h5>Configuração de Taxas Mensais</h5>
+      <div class="formgrid grid">
+        <div class="field col-6 md:col-3">
+          <label for="month">Mês</label>
+          <p-calendar [maxDate]="maxDate" [(ngModel)]="month" [touchUI]="true" view="month" dateFormat="mm/yy" [readonlyInput]="true" [showIcon]="true" styleClass="w-full"></p-calendar>
+        </div>
+      </div>
+      <div class="formgrid grid">
+        <div class="field col-6 md:col-3">
+          <label for="tusd_fornecida">TUSD Fornecida</label>
+          <p-inputNumber [(ngModel)]="tusd_fornecida" inputId="tusd_fornecida" mode="decimal" locale="pt-BR" [minFractionDigits]="2" [maxFractionDigits]="10" styleClass="w-full" class="w-full"> </p-inputNumber>
+        </div>
+        <div class="field col-6 md:col-3">
+          <label for="te_fornecida">TE Fornecida</label>
+          <p-inputNumber [(ngModel)]="te_fornecida" inputId="te_fornecida" mode="decimal" locale="pt-BR" [minFractionDigits]="2" [maxFractionDigits]="10" styleClass="w-full" class="w-full"> </p-inputNumber>
+        </div>
+        <div class="field col-6 md:col-3">
+          <label for="tusd_injetada">TUSD Injetada</label>
+          <p-inputNumber [(ngModel)]="tusd_injetada" inputId="tusd_injetada" mode="decimal" locale="pt-BR" [minFractionDigits]="2" [maxFractionDigits]="10" styleClass="w-full" class="w-full"> </p-inputNumber>
+        </div>
+        <div class="field col-6 md:col-3">
+          <label for="te_injetada">TE Injetada</label>
+          <p-inputNumber [(ngModel)]="te_injetada" inputId="te_injetada" mode="decimal" locale="pt-BR" [minFractionDigits]="2" [maxFractionDigits]="10" styleClass="w-full" class="w-full"> </p-inputNumber>
+        </div>
+        <div class="field col-6 md:col-4">
+          <p-button label="Save" (click)="updateMonthData()"></p-button>
+        </div>
+      </div>
+    </div>
+</div>
+</div>

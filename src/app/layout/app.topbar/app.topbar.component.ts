@@ -37,13 +37,18 @@ export class AppTopbarComponent implements OnDestroy {
           label: aUser?.displayName ?? '',
           items:[
             {
+              label: 'Configurações',
+              command: () => {
+                this.router.navigate(['user-settings']);
+              }
+            },
+            {
               label: 'Sair',
               command: () => {
                 this.auth.signOut();
                 this.router.navigate(['login']);
               }
             }
-
           ]
         }
       ]

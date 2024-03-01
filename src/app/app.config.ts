@@ -1,5 +1,5 @@
-import { ApplicationConfig, LOCALE_ID, importProvidersFrom, isDevMode } from '@angular/core';
-import { provideRouter } from '@angular/router';
+import { ApplicationConfig, ErrorHandler, LOCALE_ID, importProvidersFrom, isDevMode } from '@angular/core';
+import { PreloadAllModules, provideRouter, withPreloading } from '@angular/router';
 
 import { routes } from './app.routes';
 import { AngularFireModule } from '@angular/fire/compat';
@@ -15,6 +15,8 @@ import { provideFirebaseApp } from '@angular/fire/app';
 import { initializeApp } from 'firebase/app';
 import { SocketIoConfig, SocketIoModule } from 'ngx-socket-io';
 import { provideServiceWorker } from '@angular/service-worker';
+import { LoadChunkErrorHandler } from './services/load-chunk-error.handler';
+import { DialogService, DynamicDialogModule } from 'primeng/dynamicdialog';
 
 registerLocaleData(localePt);
 
@@ -22,10 +24,13 @@ const socketConfig: SocketIoConfig = { url: 'https://api-power.we-rtek.com', opt
 
 export const appConfig: ApplicationConfig = {
   providers: [
-    provideRouter(routes),
+    { provide: ErrorHandler, useClass: LoadChunkErrorHandler },
+    provideRouter(routes, withPreloading(PreloadAllModules)),
     importProvidersFrom(provideFirebaseApp(() => initializeApp(environment.firebase))),
     importProvidersFrom(provideAuth(() => getAuth())),
     importProvidersFrom(SocketIoModule.forRoot(socketConfig)),
+    importProvidersFrom(DialogService),
+    { provide: DialogService, useClass: DialogService},
     provideAnimations(),
     provideHttpClient(),
     { provide: LOCALE_ID, useValue: 'pt' },

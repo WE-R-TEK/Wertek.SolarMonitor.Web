@@ -11,12 +11,14 @@ import { AccordionModule } from 'primeng/accordion';
 import { PowerDataService } from './services/power-data.service';
 import { map } from 'rxjs';
 import { PrimeNGConfig } from 'primeng/api';
+import { AppNewversionCheckerComponent } from './layout/app.newversion.checker/app.newversion.checker.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
   imports: [
-    RouterOutlet
+    RouterOutlet,
+    AppNewversionCheckerComponent,
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.less'

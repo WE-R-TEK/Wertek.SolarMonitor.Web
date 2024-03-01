@@ -5,6 +5,8 @@ import { AppLayoutComponent } from './layout/app.layout/app.layout.component';
 import { DashboardComponent } from './pages/dashboard/dashboard.component';
 import { LoginComponent } from './pages/login/login.component';
 import { redirectUnauthorizedTo, redirectLoggedInTo, AuthGuard } from '@angular/fire/auth-guard';
+import { UserSettingsComponent } from './pages/user-settings/user-settings.component';
+import { PowerInvoiceSimulatorComponent } from './pages/power-invoice-simulator/power-invoice-simulator.component';
 
 const redirectUnauthorizedToLogin = () => redirectUnauthorizedTo(['login']);
 const redirectLoggedInToHome = () => redirectLoggedInTo(['']);
@@ -14,6 +16,8 @@ export const routes: Routes = [
     { path: '', component: DashboardComponent },
     { path: 'home', component: HomeComponent},
     { path: 'grandezas-eletricas', component: GrandezasEletricaComponent },
+    { path: 'user-settings', component: UserSettingsComponent },
+    { path: 'power-invoice-simulator', component: PowerInvoiceSimulatorComponent }
   ] },
   { path: 'login', component: LoginComponent, canActivate: [AuthGuard], data: {authGuardPipe: redirectLoggedInToHome} },
 ];

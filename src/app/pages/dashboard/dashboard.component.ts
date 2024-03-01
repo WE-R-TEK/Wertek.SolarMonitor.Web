@@ -14,6 +14,7 @@ import * as Highcharts from 'highcharts';
 import HighchartsMore from 'highcharts/highcharts-more';
 import HighchartsSolidGauge from 'highcharts/modules/solid-gauge';
 import { Socket } from 'ngx-socket-io';
+import { PowerTaxValueService } from '../../services/power-tax-value.service';
 HighchartsMore(Highcharts);
 HighchartsSolidGauge(Highcharts);
 
@@ -31,6 +32,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
   consMes = 0;
   injMes = 0;
   gerHoje = 0;
+  powerTax = 1;
+  solarTax = 1;
   Highcharts = Highcharts;
   chartPotenciaAOptions: Highcharts.Options = {};
   chartPotenciaBOptions: Highcharts.Options = {};
@@ -61,7 +64,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
     constructor(
       public layoutService: LayoutService,
       private readonly websocketService: Socket,
-      private readonly powerDataService: PowerDataService
+      private readonly powerDataService: PowerDataService,
+      private readonly powerTaxValueService: PowerTaxValueService
     ) {
         this.subscription = this.layoutService.configUpdate$
         .pipe(debounceTime(25))
@@ -78,11 +82,25 @@ export class DashboardComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit() {
+      this.getPeriodPowerTaxValue();
       this.retrieveSumData();
       this.retieveNowData();
       this.retrieveConsumoData();
       this.retrieveInjetadaData();
       this.retrieveGeracaoData();
+    }
+
+    getPeriodPowerTaxValue() {
+      const year = moment.tz('America/Sao_Paulo').year();
+      const month = moment.tz('America/Sao_Paulo').month() + 1;
+      this.powerTaxValueService.getByMonth(year, month).subscribe((data: any) => {
+        if (data) {
+          this.powerTax = data.tusd_fornecida + data.te_fornecida;
+          this.solarTax = data.tusd_injetada + data.te_injetada;
+          console.log('Power Tax: ', this.powerTax);
+          console.log('Solar Tax: ', this.solarTax);
+        }
+      });
     }
 
     retrieveConsumoData() {

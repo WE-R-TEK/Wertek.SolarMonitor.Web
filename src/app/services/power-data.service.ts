@@ -269,6 +269,35 @@ export class PowerDataService {
     return returnData;
   }
 
+  getGeracaoPerData(start: string, end: string): Observable<any> {
+    const returnData = new Observable((observer) => {
+      const fluxQuery = `from(bucket: "solarmonitor")
+      |> range(start: ${start}, stop: ${end})
+      |> filter(fn: (r) => r._measurement == "solardata")
+      |> filter(fn: (r) => r._field == "ger_per")
+      |> filter(fn: (r) => r._value > 0)
+      |> pivot(rowKey:["_time"], columnKey: ["_field"], valueColumn: "_value")
+      |> sort(columns: ["_time"])`;
+
+      const data:any[] = [];
+
+      this.queryClient.queryRows(fluxQuery, {
+        next: (row, tableMeta) => {
+          const tableObject = tableMeta.toObject(row);
+          data.push(tableObject);
+        },
+        error: (error) => {
+          observer.error(error);
+        },
+        complete: () => {
+          observer.next(data);
+          observer.complete();
+        },
+      });
+    });
+    return returnData;
+  }
+
   getDifferenceDataPeriod(start: string, end: string, field: string): Observable<any> {
     const returnData = new Observable((observer) => {
       const fluxQuery = `data = () => from(bucket: "solarmonitor")

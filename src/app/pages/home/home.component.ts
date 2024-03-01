@@ -11,6 +11,7 @@ import { HighchartsChartModule } from 'highcharts-angular';
 import * as Highcharts from 'highcharts';
 import { Socket } from 'ngx-socket-io';
 import { Subscription, map } from 'rxjs';
+import { PowerTaxValueService } from '../../services/power-tax-value.service';
 
 @Component({
   selector: 'app-home',
@@ -26,13 +27,18 @@ export class HomeComponent implements OnInit, OnDestroy{
   consMes = 0;
   injMes = 0;
   gerHoje = 0;
+  powerTax = 1;
+  solarTax = 1;
+  maxDate = new Date();
   private _date: Date = new Date();
   Highcharts = Highcharts;
   chartPotenciaAtivaOptions: Highcharts.Options = {};
   chartCorrenteOptions: Highcharts.Options = {};
   chartTensaoOptions: Highcharts.Options = {};
   chartConsumoOptions: Highcharts.Options = {};
+  chartInjetadoOptions: Highcharts.Options = {};
   chartGeracaoOptions: Highcharts.Options = {};
+  chartGeracaoPerOptions: Highcharts.Options = {};
   wsSubscription: Subscription;
 
   get date(): Date {
@@ -42,11 +48,13 @@ export class HomeComponent implements OnInit, OnDestroy{
   set date(value: Date) {
     this._date = value;
     this.updateData();
+    this.getPeriodPowerTaxValue();
   }
 
   constructor(
     private powerDataService: PowerDataService,
-    private readonly websocketService: Socket
+    private readonly websocketService: Socket,
+    private readonly powerTaxValueService: PowerTaxValueService
   ) {
     this.wsSubscription = this.websocketService.fromEvent('events').pipe(map((receivedMessage: any) => {
       console.log('Received message from websocket: ', receivedMessage);
@@ -59,6 +67,7 @@ export class HomeComponent implements OnInit, OnDestroy{
 
   ngOnInit(): void {
     this.updateData();
+    this.getPeriodPowerTaxValue();
 
   }
 
@@ -69,11 +78,29 @@ export class HomeComponent implements OnInit, OnDestroy{
     this.retrievePotenciaAtivaData();
     this.retrieveCorrenteData();
     this.retrieveTensaoData();
+    this.retrieveGeracaoData();
+    this.retrieveGeracaoPerData();
+  }
+
+  getPeriodPowerTaxValue() {
+    const year = moment(this._date).year();
+    const month = moment(this._date).month() + 1;
+    this.powerTaxValueService.getByMonth(year, month).subscribe((data: any) => {
+      if (data) {
+        this.powerTax = data.tusd_fornecida + data.te_fornecida;
+        this.solarTax = data.tusd_injetada + data.te_injetada;
+        console.log('Power Tax: ', this.powerTax);
+        console.log('Solar Tax: ', this.solarTax);
+      }
+    });
   }
 
   retrievePotenciaAtivaData() {
     const startDay = moment(this._date).startOf('day').utc().toISOString();
-    const endDay = moment(this._date).endOf('day').utc().toISOString();
+    let endDay = moment(this._date).endOf('day').utc().toISOString();
+    const today = new Date();
+    if(this._date.getFullYear() === today.getFullYear() && this._date.getMonth() === today.getMonth() && this._date.getDate() === today.getDate())
+      endDay = moment().utc().toISOString();
     this.powerDataService.getPotenciaAtivaData(startDay, endDay).subscribe((data: any) => {
       this.chartPotenciaAtivaOptions = this.powerDataService.getChartLineOptions('Potência Ativa [kW]', 'kW', [
           {title: 'Fase A', color: 'darkblue', values: data.map((d: any) => [moment.utc(d._time).valueOf(), d.pa])},
@@ -87,7 +114,10 @@ export class HomeComponent implements OnInit, OnDestroy{
 
   retrieveCorrenteData() {
     const startDay = moment(this._date).startOf('day').utc().toISOString();
-    const endDay = moment(this._date).endOf('day').utc().toISOString();
+    let endDay = moment(this._date).endOf('day').utc().toISOString();
+    const today = new Date();
+    if(this._date.getFullYear() === today.getFullYear() && this._date.getMonth() === today.getMonth() && this._date.getDate() === today.getDate())
+      endDay = moment().utc().toISOString();
     this.powerDataService.getCorrenteData(startDay, endDay).subscribe((data: any) => {
       this.chartCorrenteOptions = this.powerDataService.getChartLineOptions('Corrente [A]', 'A', [
           {title: 'Fase A', color: 'darkblue', values: data.map((d: any) => [moment.utc(d._time).valueOf(), d.iarms])},
@@ -101,7 +131,10 @@ export class HomeComponent implements OnInit, OnDestroy{
 
   retrieveTensaoData() {
     const startDay = moment(this._date).startOf('day').utc().toISOString();
-    const endDay = moment(this._date).endOf('day').utc().toISOString();
+    let endDay = moment(this._date).endOf('day').utc().toISOString();
+    const today = new Date();
+    if(this._date.getFullYear() === today.getFullYear() && this._date.getMonth() === today.getMonth() && this._date.getDate() === today.getDate())
+      endDay = moment().utc().toISOString();
     this.powerDataService.getTensaoData(startDay, endDay).subscribe((data: any) => {
       this.chartTensaoOptions = this.powerDataService.getChartLineOptions('Tensão [V]', 'V', [
           {title: 'Fase A', color: 'darkblue', values: data.map((d: any) => [moment.utc(d._time).valueOf(), d.uarms])},
@@ -114,7 +147,10 @@ export class HomeComponent implements OnInit, OnDestroy{
 
   retrieveConsumoData() {
     const startDay = moment(this._date).startOf('day').utc().toISOString();
-    const endDay = moment(this._date).endOf('day').utc().toISOString();
+    let endDay = moment(this._date).endOf('day').utc().toISOString();
+    const today = new Date();
+    if(this._date.getFullYear() === today.getFullYear() && this._date.getMonth() === today.getMonth() && this._date.getDate() === today.getDate())
+      endDay = moment().utc().toISOString();
     this.powerDataService.getConsumoData(startDay, endDay).subscribe((data: any) => {
       this.chartConsumoOptions = this.powerDataService.getChartLineOptions('Consumo de Energia [kWh]', 'kWh', [
           {title: 'Fase A', color: 'darkblue', values: data.map((d: any) => [moment.utc(d._time).valueOf(), d.epa_c])},
@@ -128,15 +164,44 @@ export class HomeComponent implements OnInit, OnDestroy{
 
   retrieveInjetadaData() {
     const startDay = moment(this._date).startOf('day').utc().toISOString();
-    const endDay = moment(this._date).endOf('day').utc().toISOString();
+    let endDay = moment(this._date).endOf('day').utc().toISOString();
+    const today = new Date();
+    if(this._date.getFullYear() === today.getFullYear() && this._date.getMonth() === today.getMonth() && this._date.getDate() === today.getDate())
+      endDay = moment().utc().toISOString();
     this.powerDataService.getInjetadaData(startDay, endDay).subscribe((data: any) => {
-      this.chartGeracaoOptions = this.powerDataService.getChartLineOptions('Energia Injetada (Geração) [kWh]', 'kWh', [
+      this.chartInjetadoOptions = this.powerDataService.getChartLineOptions('Energia Injetada (Geração) [kWh]', 'kWh', [
           {title: 'Fase A', color: 'darkblue', values: data.map((d: any) => [moment.utc(d._time).valueOf(), d.epa_g])},
           {title: 'Fase B', color: 'darkgreen', values: data.map((d: any) => [moment.utc(d._time).valueOf(), d.epb_g])},
           {title: 'Fase C', color: 'darkred', values: data.map((d: any) => [moment.utc(d._time).valueOf(), d.epc_g])},
           {title: 'Total', color: 'black', values: data.map((d: any) => [moment.utc(d._time).valueOf(), d.ept_g])},
         ]
       );
+    });
+  }
+
+  retrieveGeracaoData() {
+    const startDay = moment(this._date).startOf('day').utc().toISOString();
+    let endDay = moment(this._date).endOf('day').utc().toISOString();
+    const today = new Date();
+    if(this._date.getFullYear() === today.getFullYear() && this._date.getMonth() === today.getMonth() && this._date.getDate() === today.getDate())
+      endDay = moment().utc().toISOString();
+    this.powerDataService.getGeracaoData(startDay, endDay).subscribe((data: any) => {
+      console.log('Geracao Data: ', data);
+      this.chartGeracaoOptions = this.powerDataService.getChartLineOptions('Energia Gerada [kWh]', 'kWh', [
+          {title: 'Total', color: 'black', values: data.map((d: any) => [moment.utc(d._time).valueOf(), d.total])},
+        ]
+      );
+    });
+  }
+
+  retrieveGeracaoPerData() {
+    const startDay = moment(this._date).startOf('day').utc().toISOString();
+    let endDay = moment(this._date).endOf('day').utc().toISOString();
+    const today = new Date();
+    if(this._date.getFullYear() === today.getFullYear() && this._date.getMonth() === today.getMonth() && this._date.getDate() === today.getDate())
+      endDay = moment().utc().toISOString();
+    this.powerDataService.getGeracaoPerData(startDay, endDay).subscribe((data: any) => {
+      this.chartGeracaoPerOptions = this.powerDataService.getChartAreaOptions('Energia Gerada por Período [kWh]', 'kWh', 'darkblue', data.map((d: any) => [moment.utc(d._time).valueOf(), d.ger_per]));
     });
   }
 
