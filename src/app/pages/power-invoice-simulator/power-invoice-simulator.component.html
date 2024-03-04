@@ -17,32 +17,65 @@
         </div>
       </p-fieldset>
       <p-fieldset legend="Resultado de {{startDateShow | date: 'dd/MM/yyyy'}} até {{endDateShow | date: 'dd/MM/yyyy'}}" styleClass="mt-4">
-        <p-table [value]="simulationData" responsiveLayout="stack" [breakpoint]="'600px'">
-          <ng-template pTemplate="header" let-columns>
-            <tr>
-              <th>Descrição</th>
-              <th>Quantidade kWh</th>
-              <th>Tarifa R$</th>
-              <th>Valor R$</th>
-            </tr>
-          </ng-template>
-          <ng-template pTemplate="body" let-data>
-            <tr>
-              <td><span class="p-column-title">Name</span>{{data.description}}</td>
-              <td><span class="p-column-title">Quantidade kWh</span>{{data.quantity | number:'1.2-2':'pt'}}</td>
-              <td><span class="p-column-title">Tarifa R$</span>{{data.rate | number:'1.2-8':'pt'}}</td>
-              <td><span class="p-column-title">Valor R$</span>{{data.value | number:'1.2-2':'pt'}}</td>
-            </tr>
-          </ng-template>
-          <ng-template pTemplate="summary" class="hidden">
-            <div class="flex flex-row justify-content-between md:justify-content-end">
-              <p class="md:mr-5">Valor total da fatura</p>
-              <p class="md:mr-5">R$ {{total | number:'1.2-2':'pt'}}</p>
+        <div class="grid">
+          <div class="col-12 md:col-4 lg:col-4">
+            <div class=" shadow-2 p-3 border-round bg-red-100">
+              <div class="flex justify-content-center mb-3">
+                  <div class="flex flex-column justify-content-around align-content-center">
+                      <span class="block text-red-500 font-bold mb-3 text-cente text-xl">Total Consumido</span>
+                      <div class="text-red-900 font-bold text-2xl text-center">{{consumoReal | number:'1.2-2':'pt'}} kWh</div>
+                  </div>
+              </div>
             </div>
-          </ng-template>
-        </p-table>
+          </div>
+          <div class="col-12 md:col-4 lg:col-4">
+            <div class="shadow-2 p-3 border-round bg-blue-100">
+              <div class="flex justify-content-center mb-3">
+                  <div class="flex flex-column justify-content-around align-content-center">
+                      <span class="block text-blue-500 font-bold mb-3 text-center text-xl">Total Gerado</span>
+                      <div class="text-blue-900 font-bold text-2xl text-center">{{geradoReal | number:'1.2-2':'pt'}} kWh</div>
+                  </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-12 md:col-4 lg:col-4">
+            <div class="shadow-2 p-3 border-round" [ngClass]="lucro ? 'bg-blue-100' : 'bg-red-100'">
+              <div class="flex justify-content-center mb-3">
+                  <div class="flex flex-column justify-content-around align-content-center">
+                      <span class="block font-bold mb-3 text-center text-xl" [ngClass]="lucro ? 'text-blue-500' : 'text-red-500'">Saldo {{lucro ? "(+)" : "(-)"}}</span>
+                      <div class="font-bold text-2xl text-center" [ngClass]="lucro ? 'text-blue-900' : 'text-red-900'">{{saldo | number:'1.2-2':'pt'}} kWh</div>
+                  </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-12 md:col-12 lg:col-12">
+            <p-table [value]="simulationData" responsiveLayout="stack" [breakpoint]="'600px'">
+              <ng-template pTemplate="header" let-columns>
+                <tr>
+                  <th>Descrição</th>
+                  <th>Quantidade kWh</th>
+                  <th>Tarifa R$</th>
+                  <th>Valor R$</th>
+                </tr>
+              </ng-template>
+              <ng-template pTemplate="body" let-data>
+                <tr>
+                  <td><span class="p-column-title">Name</span>{{data.description}}</td>
+                  <td><span class="p-column-title">Quantidade kWh</span>{{data.quantity | number:'1.2-2':'pt'}}</td>
+                  <td><span class="p-column-title">Tarifa R$</span>{{data.rate | number:'1.2-8':'pt'}}</td>
+                  <td><span class="p-column-title">Valor R$</span>{{data.value | number:'1.2-2':'pt'}}</td>
+                </tr>
+              </ng-template>
+              <ng-template pTemplate="summary" class="hidden">
+                <div class="flex flex-row justify-content-between md:justify-content-end">
+                  <p class="md:mr-5">Valor total da fatura</p>
+                  <p class="md:mr-5">R$ {{total | number:'1.2-2':'pt'}}</p>
+                </div>
+              </ng-template>
+            </p-table>
+          </div>
+        </div>
       </p-fieldset>
-
     </p-card>
   </div>
 </div>

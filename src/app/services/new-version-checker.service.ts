@@ -1,5 +1,7 @@
 import { Injectable, NgZone } from '@angular/core';
+import { Router } from '@angular/router';
 import { SwUpdate } from '@angular/service-worker';
+import { Socket } from 'ngx-socket-io';
 import { Subscription, interval } from 'rxjs';
 
 @Injectable({
@@ -12,10 +14,17 @@ export class NewVersionCheckerService {
 
   constructor(
     private swUpdate: SwUpdate,
-    private zone: NgZone
+    private zone: NgZone,
+    private readonly websocket: Socket,
   ) {
     console.log('NewVersionCheckerService created');
     this.checkForUpdates();
+    document.onvisibilitychange = (e) => {
+      if (!document.hidden) {
+        this.websocket.connect();
+        this.websocket.emit('events', 'reload');
+      }
+    }
   }
 
   checkForUpdates(): void {

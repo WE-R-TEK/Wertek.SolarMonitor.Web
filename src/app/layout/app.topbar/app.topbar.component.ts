@@ -6,6 +6,7 @@ import { CommonModule } from '@angular/common';
 import { MenuModule } from 'primeng/menu';
 import { Auth, User, authState } from '@angular/fire/auth';
 import { Subscription } from 'rxjs';
+import { Socket } from 'ngx-socket-io';
 
 @Component({
   selector: 'app-topbar',
@@ -29,7 +30,8 @@ export class AppTopbarComponent implements OnDestroy {
 
   constructor(
     public layoutService: LayoutService,
-    private readonly router: Router
+    private readonly router: Router,
+    private readonly websocketService: Socket,
   ) {
     this.authStateSubscription = this.authState$.subscribe((aUser: User | null) => {
       this.itemsmu = [
@@ -57,5 +59,10 @@ export class AppTopbarComponent implements OnDestroy {
 
   ngOnDestroy() {
     this.authStateSubscription.unsubscribe();
+  }
+
+  sendRefresh() {
+    this.websocketService.connect();
+    this.websocketService.emit('events', 'refresh');
   }
 }
