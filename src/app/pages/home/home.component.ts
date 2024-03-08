@@ -11,7 +11,6 @@ import { HighchartsChartModule } from 'highcharts-angular';
 import * as Highcharts from 'highcharts';
 import { Socket } from 'ngx-socket-io';
 import { Subscription, map } from 'rxjs';
-import { PowerTaxValueService } from '../../services/power-tax-value.service';
 import { ResumoConsumoComponent } from '../../components/resumo-consumo/resumo-consumo.component';
 
 @Component({
@@ -45,8 +44,7 @@ export class HomeComponent implements OnInit, OnDestroy{
 
   constructor(
     private powerDataService: PowerDataService,
-    private readonly websocketService: Socket,
-    private readonly powerTaxValueService: PowerTaxValueService
+    private readonly websocketService: Socket
   ) {
     this.wsSubscription = this.websocketService.fromEvent('events').pipe(map((receivedMessage: any) => {
       console.log('Received message from websocket: ', receivedMessage);

@@ -14,7 +14,6 @@ import * as Highcharts from 'highcharts';
 import HighchartsMore from 'highcharts/highcharts-more';
 import HighchartsSolidGauge from 'highcharts/modules/solid-gauge';
 import { Socket } from 'ngx-socket-io';
-import { PowerTaxValueService } from '../../services/power-tax-value.service';
 import { ResumoConsumoComponent } from '../../components/resumo-consumo/resumo-consumo.component';
 HighchartsMore(Highcharts);
 HighchartsSolidGauge(Highcharts);
@@ -57,8 +56,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     constructor(
       public layoutService: LayoutService,
       private readonly websocketService: Socket,
-      private readonly powerDataService: PowerDataService,
-      private readonly powerTaxValueService: PowerTaxValueService
+      private readonly powerDataService: PowerDataService
     ) {
         this.subscription = this.layoutService.configUpdate$
         .pipe(debounceTime(25))
