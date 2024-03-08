@@ -12,23 +12,16 @@ import * as Highcharts from 'highcharts';
 import { Socket } from 'ngx-socket-io';
 import { Subscription, map } from 'rxjs';
 import { PowerTaxValueService } from '../../services/power-tax-value.service';
+import { ResumoConsumoComponent } from '../../components/resumo-consumo/resumo-consumo.component';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CardModule, CommonModule, ChartModule, CalendarModule, FormsModule, HighchartsChartModule],
+  imports: [CardModule, CommonModule, ChartModule, CalendarModule, FormsModule, HighchartsChartModule, ResumoConsumoComponent],
   templateUrl: './home.component.html',
   styleUrl: './home.component.less'
 })
 export class HomeComponent implements OnInit, OnDestroy{
-  consHoje = 0;
-  injHoje = 0;
-  gerMes = 0;
-  consMes = 0;
-  injMes = 0;
-  gerHoje = 0;
-  powerTax = 1;
-  solarTax = 1;
   maxDate = new Date();
   private _date: Date = new Date();
   Highcharts = Highcharts;
@@ -48,7 +41,6 @@ export class HomeComponent implements OnInit, OnDestroy{
   set date(value: Date) {
     this._date = value;
     this.updateData();
-    this.getPeriodPowerTaxValue();
   }
 
   constructor(
@@ -67,12 +59,10 @@ export class HomeComponent implements OnInit, OnDestroy{
 
   ngOnInit(): void {
     this.updateData();
-    this.getPeriodPowerTaxValue();
 
   }
 
   updateData() {
-    this.retrieveSumData();
     this.retrieveConsumoData();
     this.retrieveInjetadaData();
     this.retrievePotenciaAtivaData();
@@ -80,19 +70,6 @@ export class HomeComponent implements OnInit, OnDestroy{
     this.retrieveTensaoData();
     this.retrieveGeracaoData();
     this.retrieveGeracaoPerData();
-  }
-
-  getPeriodPowerTaxValue() {
-    const year = moment(this._date).year();
-    const month = moment(this._date).month() + 1;
-    this.powerTaxValueService.getByMonth(year, month).subscribe((data: any) => {
-      if (data) {
-        this.powerTax = data.tusd_fornecida + data.te_fornecida;
-        this.solarTax = data.tusd_injetada + data.te_injetada;
-        console.log('Power Tax: ', this.powerTax);
-        console.log('Solar Tax: ', this.solarTax);
-      }
-    });
   }
 
   retrievePotenciaAtivaData() {
@@ -202,32 +179,6 @@ export class HomeComponent implements OnInit, OnDestroy{
       endDay = moment().utc().toISOString();
     this.powerDataService.getGeracaoPerData(startDay, endDay).subscribe((data: any) => {
       this.chartGeracaoPerOptions = this.powerDataService.getChartAreaOptions('Energia Gerada por Período [kWh]', 'kWh', 'darkblue', data.map((d: any) => [moment.utc(d._time).valueOf(), d.ger_per]));
-    });
-  }
-
-  retrieveSumData() {
-
-    const startDay = moment(this._date).startOf('day').utc().toISOString();
-    const endDay = moment(this._date).endOf('day').utc().toISOString();
-    const startMonth = moment(this._date).startOf('month').utc().toISOString();
-    const endMonth = moment(this._date).endOf('month').utc().toISOString();
-    this.powerDataService.getDifferenceDataPeriod(startDay, endDay, 'ept_c').subscribe((data: any) => {
-      this.consHoje = data;
-    });
-    this.powerDataService.getDifferenceDataPeriod(startDay, endDay, 'ept_g').subscribe((data: any) => {
-      this.injHoje = data;
-    });
-    this.powerDataService.getDifferenceDataPeriod(startMonth, endMonth, 'ept_c').subscribe((data: any) => {
-      this.consMes = data;
-    });
-    this.powerDataService.getDifferenceDataPeriod(startMonth, endMonth, 'ept_g').subscribe((data: any) => {
-      this.injMes = data;
-    });
-    this.powerDataService.getGeradoTotalPeriod(startDay, endDay).subscribe((data: any) => {
-      this.gerHoje = data;
-    });
-    this.powerDataService.getGeradoTotalPeriod(startMonth, endMonth).subscribe((data: any) => {
-      this.gerMes = data;
     });
   }
 }

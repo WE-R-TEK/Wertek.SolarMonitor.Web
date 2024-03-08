@@ -108,7 +108,7 @@ export class PowerInvoiceSimulatorComponent implements OnInit{
   updateCalc(data: any) {
     data.value = data.quantity * data.rate;
     this.total = this.simulationData.reduce((acc, item) => acc + item.value, 0);
-    this.consumoReal = this.totalConsumido - (this.totalGerado - this.totalInjetado > 0 ? this.totalGerado - this.totalInjetado : 0);
+    this.consumoReal = this.totalConsumido + (this.totalGerado - this.totalInjetado > 0 ? this.totalGerado - this.totalInjetado : 0);
     this.geradoReal = this.totalGerado < this.totalInjetado ? this.totalInjetado : this.totalGerado;
     if (this.consumoReal > this.geradoReal) {
       this.lucro = false;
