@@ -122,5 +122,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
       this.wsSubscription.unsubscribe();
     }
 
-
+    updateDados() {
+      this.powerDataService.updateData();
+    }
 }

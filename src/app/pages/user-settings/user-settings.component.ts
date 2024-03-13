@@ -19,6 +19,7 @@ export class UserSettingsComponent implements OnInit {
   te_fornecida: number = 0;
   tusd_injetada: number = 0;
   te_injetada: number = 0;
+  id: number | null = null;
   maxDate = new Date();
 
   get month(): Date {
@@ -47,12 +48,14 @@ export class UserSettingsComponent implements OnInit {
         this.te_fornecida = 0;
         this.tusd_injetada = 0;
         this.te_injetada = 0;
+        this.id = null;
         return;
       }
       this.tusd_fornecida = data.tusd_fornecida ?? 0;
       this.te_fornecida = data.te_fornecida ?? 0;
       this.tusd_injetada = data.tusd_injetada ?? 0;
       this.te_injetada = data.te_injetada ?? 0;
+      this.id = data.id;
     });
   }
 
@@ -64,9 +67,16 @@ export class UserSettingsComponent implements OnInit {
       te_fornecida: this.te_fornecida,
       tusd_injetada: this.tusd_injetada,
       te_injetada: this.te_injetada,
-      date: moment.utc().toDate()
+      year: year,
+      month: month,
+      date: moment.utc().toDate(),
+      id: this.id
     };
-    this.powerTaxValueService.update(year, month, value).subscribe();
+    if (this.id === null) {
+      this.powerTaxValueService.insert(value).subscribe();
+      return;
+    }
+    this.powerTaxValueService.update(this.id, value).subscribe();
   }
 
 }

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { InfluxDB } from '@influxdata/influxdb-client';
+import { InfluxDB, Point } from '@influxdata/influxdb-client';
 import moment from 'moment-timezone';
 import { Observable } from 'rxjs';
 import * as Highcharts from 'highcharts';
@@ -21,11 +21,131 @@ export class PowerDataService {
     this.queryClient = this.client.getQueryApi(this.org);
   }
 
+  async updateData() {
+    const fluxQuery = `from(bucket: "solarmonitor")
+      |> range(start: 2024-01-01T00:00:00Z)
+      |> filter(fn: (r) => r._measurement == "powerdata" )
+      |> filter(fn: (r) => r.user == "user_identity" )
+      |> pivot(rowKey:["_time"], columnKey: ["_field"], valueColumn: "_value")
+      |> sort(columns: ["_time"])`;
+
+      console.log('fluxQuery', fluxQuery);
+
+      console.log('Obtendo dados...');
+
+      const queryClient = this.client.getQueryApi(this.org);
+
+      const data = await queryClient.collectRows(fluxQuery, (row, tableMeta) =>
+        tableMeta.toObject(row),
+      );
+
+      console.log('total de dados...', data.length);
+
+      for (let index = 0; index < data.length; index++) {
+
+        const writeClient = this.client.getWriteApi(this.org, 'solarmonitor', 'ms');
+
+        const dataF: any = data[index];
+
+        let last_epa_c = 0;
+        let last_epb_c = 0;
+        let last_epc_c = 0;
+        let last_ept_c = 0;
+        let last_epa_g = 0;
+        let last_epb_g = 0;
+        let last_epc_g = 0;
+        let last_ept_g = 0;
+
+        if (index > 0) {
+          last_epa_c = data[index]['epa_c'] ?? 0;
+          last_epb_c = data[index]['epb_c'] ?? 0;
+          last_epc_c = data[index]['epc_c'] ?? 0;
+          last_ept_c = data[index]['ept_c'] ?? 0;
+          last_epa_g = data[index]['epa_g'] ?? 0;
+          last_epb_g = data[index]['epb_g'] ?? 0;
+          last_epc_g = data[index]['epc_g'] ?? 0;
+          last_ept_g = data[index]['ept_g'] ?? 0;
+        }
+
+        const epa_c_period = dataF.epa_c - last_epa_c;
+        const epb_c_period = dataF.epb_c - last_epb_c;
+        const epc_c_period = dataF.epc_c - last_epc_c;
+        const ept_c_period = dataF.ept_c - last_ept_c;
+        const epa_g_period = dataF.epa_g - last_epa_g;
+        const epb_g_period = dataF.epb_g - last_epb_g;
+        const epc_g_period = dataF.epc_g - last_epc_g;
+        const ept_g_period = dataF.ept_g - last_ept_g;
+
+        const point = new Point('powerdata')
+        .tag('user', 'ricardo.ara.silva@gmail.com')
+        .tag('version', '1.0.0')
+        .timestamp(new Date(dataF._time))
+        .floatField('pa', dataF.pa)
+        .floatField('pb', dataF.pb)
+        .floatField('pc', dataF.pc)
+        .floatField('pt', dataF.pt)
+        .floatField('epa_c', dataF.epa_c)
+        .floatField('epb_c', dataF.epb_c)
+        .floatField('epc_c', dataF.epc_c)
+        .floatField('ept_c', dataF.ept_c)
+        .floatField('epa_g', dataF.epa_g)
+        .floatField('epb_g', dataF.epb_g)
+        .floatField('epc_g', dataF.epc_g)
+        .floatField('ept_g', dataF.ept_g)
+        .floatField('iarms', dataF.iarms)
+        .floatField('ibrms', dataF.ibrms)
+        .floatField('icrms', dataF.icrms)
+        .floatField('uarms', dataF.uarms)
+        .floatField('ubrms', dataF.ubrms)
+        .floatField('ucrms', dataF.ucrms)
+        .floatField('freq', dataF.freq)
+        .floatField('id', dataF.id)
+        .floatField('itrms', dataF.itrms)
+        .floatField('pfa', dataF.pfa)
+        .floatField('pfb', dataF.pfb)
+        .floatField('pfc', dataF.pfc)
+        .floatField('pft', dataF.pft)
+        .floatField('pga', dataF.pga)
+        .floatField('pgb', dataF.pgb)
+        .floatField('pgc', dataF.pgc)
+        .floatField('qa', dataF.qa)
+        .floatField('qb', dataF.qb)
+        .floatField('qc', dataF.qc)
+        .floatField('qt', dataF.qt)
+        .floatField('sa', dataF.sa)
+        .floatField('sb', dataF.sb)
+        .floatField('sc', dataF.sc)
+        .floatField('st', dataF.st)
+        .floatField('tpsd', dataF.tpsd)
+        .floatField('yuaub', dataF.yuaub)
+        .floatField('yuauc', dataF.yuauc)
+        .floatField('yubuc', dataF.yubuc)
+        .floatField('epa_c_period', epa_c_period)
+        .floatField('epb_c_period', epb_c_period)
+        .floatField('epc_c_period', epc_c_period)
+        .floatField('ept_c_period', ept_c_period)
+        .floatField('epa_g_period', epa_g_period)
+        .floatField('epb_g_period', epb_g_period)
+        .floatField('epc_g_period', epc_g_period)
+        .floatField('ept_g_period', ept_g_period);
+
+        console.clear();
+
+        console.log('salvando ponto '+ dataF._time);
+
+
+
+        writeClient.writePoint(point);
+        await writeClient.flush();
+      }
+  }
+
   getPotenciaAtivaData(start: string, end: string): Observable<any> {
     const returnData = new Observable((observer) => {
       const fluxQuery = `from(bucket: "solarmonitor")
       |> range(start: ${start}, stop: ${end})
       |> filter(fn: (r) => r._measurement == "powerdata")
+      |> filter(fn: (r) => r.user == "ricardo.ara.silva@gmail.com")
         |> filter(fn: (r) => r._field == "pa" or
         r._field == "pb" or
         r._field == "pc" or
@@ -60,6 +180,7 @@ export class PowerDataService {
       const fluxQuery = `from(bucket: "solarmonitor")
       |> range(start: ${start}, stop: ${end})
       |> filter(fn: (r) => r._measurement == "powerdata")
+      |> filter(fn: (r) => r.user == "ricardo.ara.silva@gmail.com")
         |> filter(fn: (r) => r._field == "iarms" or
         r._field == "ibrms" or
         r._field == "icrms" or
@@ -94,6 +215,7 @@ export class PowerDataService {
       const fluxQuery = `from(bucket: "solarmonitor")
       |> range(start: ${start}, stop: ${end})
       |> filter(fn: (r) => r._measurement == "powerdata")
+      |> filter(fn: (r) => r.user == "ricardo.ara.silva@gmail.com")
         |> filter(fn: (r) => r._field == "uarms" or
         r._field == "ubrms" or
         r._field == "ucrms")
@@ -128,6 +250,7 @@ export class PowerDataService {
       from(bucket: "solarmonitor")
         |> range(start: ${start}, stop: ${end})
         |> filter(fn: (r) => r._measurement == "powerdata")
+        |> filter(fn: (r) => r.user == "ricardo.ara.silva@gmail.com")
         |> filter(fn: (r) => r._field == "epa_c" or
           r._field == "epb_c" or
           r._field == "epc_c" or
@@ -179,6 +302,7 @@ export class PowerDataService {
       from(bucket: "solarmonitor")
         |> range(start: ${start}, stop: ${end})
         |> filter(fn: (r) => r._measurement == "powerdata")
+        |> filter(fn: (r) => r.user == "ricardo.ara.silva@gmail.com")
         |> filter(fn: (r) => r._field == "epa_g" or
           r._field == "epb_g" or
           r._field == "epc_g" or
@@ -303,12 +427,14 @@ export class PowerDataService {
       const fluxQuery = `data = () => from(bucket: "solarmonitor")
         |> range(start: ${start}, stop: ${end})
         |> filter(fn: (r) => r._measurement == "powerdata" and r._field == "${field}")
+        |> filter(fn: (r) => r.user == "ricardo.ara.silva@gmail.com")
+        |> sort(columns: ["_time"])
 
-        first = data() |> first()
+        first = data() |> first() |> tableFind(fn: (key) => true) |> getRecord(idx: 0)
         last = data() |> last()
 
-        union(tables: [first, last])
-          |> difference()`;
+        last
+          |> map(fn: (r) => ({r with _value: r._value - first._value}))`;
 
 
       this.queryClient.queryRows(fluxQuery, {
@@ -333,11 +459,11 @@ export class PowerDataService {
       |> range(start: ${start}, stop: ${end})
       |> filter(fn: (r) => r._measurement == "solardata" and r._field == "total")
 
-      first = data() |> first()
+      first = data() |> first() |> tableFind(fn: (key) => true) |> getRecord(idx: 0)
       last = data() |> last()
 
-      union(tables: [first, last])
-        |> difference()`;
+      last
+        |> map(fn: (r) => ({r with _value: r._value - first._value}))`;
 
 
       this.queryClient.queryRows(fluxQuery, {
@@ -361,6 +487,7 @@ export class PowerDataService {
       const fluxQuery = `from (bucket: "solarmonitor")
       |> range(start: -15m)
       |> filter(fn: (r) => r._measurement == "powerdata")
+      |> filter(fn: (r) => r.user == "ricardo.ara.silva@gmail.com")
       |> sort(columns: ["_time"])
       |> last()
       |> pivot(rowKey:["_time"], columnKey: ["_field"], valueColumn: "_value")`;

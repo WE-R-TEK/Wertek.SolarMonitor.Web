@@ -1,0 +1,26 @@
+<div class="grid">
+  <div class="col-12 lg:col-12 xl:col-12">
+    <div class="card mb-0">
+      <div class="formgrid grid">
+        <div class="field col-12 md:col-3">
+          <label>Período</label>
+          <p-dropdown [options]="periodos" [(ngModel)]="selectedPeriodo" optionLabel="label"
+            optionValue="value" styleClass="w-full"></p-dropdown>
+        </div>
+        <div class="field col-12 md:col-3">
+          <label for="icon">Data</label>
+          <p-calendar [(ngModel)]="date" [touchUI]="true" [readonlyInput]="true" [showIcon]="true" inputId="icon"
+            dateFormat="dd/mm/yy" [maxDate]="maxDate" styleClass="w-full"></p-calendar>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="grid">
+  <div class="col-12 xl:col-12">
+    <div class="card">
+      <highcharts-chart [Highcharts]="Highcharts" [options]="chartConsumoOptions" [oneToOne]="true"
+        style="width: 100%; height: 400px; display: block;"></highcharts-chart>
+    </div>
+  </div>
+</div>

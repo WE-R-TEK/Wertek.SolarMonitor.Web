@@ -17,7 +17,11 @@ export class PowerTaxValueService {
     return this.http.get(`${this.api}/power-tax-value/year/${year}/month/${month}`);
   }
 
-  update(year: number, month: number, value: any): Observable<any> {
-    return this.http.post(`${this.api}/power-tax-value/year/${year}/month/${month}`, value);
+  update(id: number, value: any): Observable<any> {
+    return this.http.patch(`${this.api}/power-tax-value/${id}`, value);
+  }
+
+  insert(value: any): Observable<any> {
+    return this.http.post(`${this.api}/power-tax-value`, value);
   }
 }
