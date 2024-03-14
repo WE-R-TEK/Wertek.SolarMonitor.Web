@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import { InfluxDB, Point } from '@influxdata/influxdb-client';
-import moment from 'moment-timezone';
 import { Observable } from 'rxjs';
 import * as Highcharts from 'highcharts';
 
@@ -29,54 +28,54 @@ export class PowerDataService {
       |> pivot(rowKey:["_time"], columnKey: ["_field"], valueColumn: "_value")
       |> sort(columns: ["_time"])`;
 
-      console.log('fluxQuery', fluxQuery);
+    console.log('fluxQuery', fluxQuery);
 
-      console.log('Obtendo dados...');
+    console.log('Obtendo dados...');
 
-      const queryClient = this.client.getQueryApi(this.org);
+    const queryClient = this.client.getQueryApi(this.org);
 
-      const data = await queryClient.collectRows(fluxQuery, (row, tableMeta) =>
-        tableMeta.toObject(row),
-      );
+    const data = await queryClient.collectRows(fluxQuery, (row, tableMeta) =>
+      tableMeta.toObject(row),
+    );
 
-      console.log('total de dados...', data.length);
+    console.log('total de dados...', data.length);
 
-      for (let index = 0; index < data.length; index++) {
+    for (let index = 0; index < data.length; index++) {
 
-        const writeClient = this.client.getWriteApi(this.org, 'solarmonitor', 'ms');
+      const writeClient = this.client.getWriteApi(this.org, 'solarmonitor', 'ms');
 
-        const dataF: any = data[index];
+      const dataF: any = data[index];
 
-        let last_epa_c = 0;
-        let last_epb_c = 0;
-        let last_epc_c = 0;
-        let last_ept_c = 0;
-        let last_epa_g = 0;
-        let last_epb_g = 0;
-        let last_epc_g = 0;
-        let last_ept_g = 0;
+      let last_epa_c = 0;
+      let last_epb_c = 0;
+      let last_epc_c = 0;
+      let last_ept_c = 0;
+      let last_epa_g = 0;
+      let last_epb_g = 0;
+      let last_epc_g = 0;
+      let last_ept_g = 0;
 
-        if (index > 0) {
-          last_epa_c = data[index]['epa_c'] ?? 0;
-          last_epb_c = data[index]['epb_c'] ?? 0;
-          last_epc_c = data[index]['epc_c'] ?? 0;
-          last_ept_c = data[index]['ept_c'] ?? 0;
-          last_epa_g = data[index]['epa_g'] ?? 0;
-          last_epb_g = data[index]['epb_g'] ?? 0;
-          last_epc_g = data[index]['epc_g'] ?? 0;
-          last_ept_g = data[index]['ept_g'] ?? 0;
-        }
+      if (index > 0) {
+        last_epa_c = data[index]['epa_c'] ?? 0;
+        last_epb_c = data[index]['epb_c'] ?? 0;
+        last_epc_c = data[index]['epc_c'] ?? 0;
+        last_ept_c = data[index]['ept_c'] ?? 0;
+        last_epa_g = data[index]['epa_g'] ?? 0;
+        last_epb_g = data[index]['epb_g'] ?? 0;
+        last_epc_g = data[index]['epc_g'] ?? 0;
+        last_ept_g = data[index]['ept_g'] ?? 0;
+      }
 
-        const epa_c_period = dataF.epa_c - last_epa_c;
-        const epb_c_period = dataF.epb_c - last_epb_c;
-        const epc_c_period = dataF.epc_c - last_epc_c;
-        const ept_c_period = dataF.ept_c - last_ept_c;
-        const epa_g_period = dataF.epa_g - last_epa_g;
-        const epb_g_period = dataF.epb_g - last_epb_g;
-        const epc_g_period = dataF.epc_g - last_epc_g;
-        const ept_g_period = dataF.ept_g - last_ept_g;
+      const epa_c_period = dataF.epa_c - last_epa_c;
+      const epb_c_period = dataF.epb_c - last_epb_c;
+      const epc_c_period = dataF.epc_c - last_epc_c;
+      const ept_c_period = dataF.ept_c - last_ept_c;
+      const epa_g_period = dataF.epa_g - last_epa_g;
+      const epb_g_period = dataF.epb_g - last_epb_g;
+      const epc_g_period = dataF.epc_g - last_epc_g;
+      const ept_g_period = dataF.ept_g - last_ept_g;
 
-        const point = new Point('powerdata')
+      const point = new Point('powerdata')
         .tag('user', 'ricardo.ara.silva@gmail.com')
         .tag('version', '1.0.0')
         .timestamp(new Date(dataF._time))
@@ -129,15 +128,15 @@ export class PowerDataService {
         .floatField('epc_g_period', epc_g_period)
         .floatField('ept_g_period', ept_g_period);
 
-        console.clear();
+      console.clear();
 
-        console.log('salvando ponto '+ dataF._time);
+      console.log('salvando ponto ' + dataF._time);
 
 
 
-        writeClient.writePoint(point);
-        await writeClient.flush();
-      }
+      writeClient.writePoint(point);
+      await writeClient.flush();
+    }
   }
 
   getPotenciaAtivaData(start: string, end: string): Observable<any> {
@@ -156,7 +155,7 @@ export class PowerDataService {
       |> pivot(rowKey:["_time"], columnKey: ["_field"], valueColumn: "_value")
       |> sort(columns: ["_time"])`;
 
-      const data:any[] = [];
+      const data: any[] = [];
 
       this.queryClient.queryRows(fluxQuery, {
         next: (row, tableMeta) => {
@@ -191,7 +190,7 @@ export class PowerDataService {
       |> pivot(rowKey:["_time"], columnKey: ["_field"], valueColumn: "_value")
       |> sort(columns: ["_time"])`;
 
-      const data:any[] = [];
+      const data: any[] = [];
 
       this.queryClient.queryRows(fluxQuery, {
         next: (row, tableMeta) => {
@@ -225,7 +224,7 @@ export class PowerDataService {
       |> pivot(rowKey:["_time"], columnKey: ["_field"], valueColumn: "_value")
       |> sort(columns: ["_time"])`;
 
-      const data:any[] = [];
+      const data: any[] = [];
 
       this.queryClient.queryRows(fluxQuery, {
         next: (row, tableMeta) => {
@@ -277,7 +276,7 @@ export class PowerDataService {
         }))
         |> sort(columns: ["_time"])`;
 
-      const data:any[] = [];
+      const data: any[] = [];
 
       this.queryClient.queryRows(fluxQuery, {
         next: (row, tableMeta) => {
@@ -329,7 +328,7 @@ export class PowerDataService {
         }))
         |> sort(columns: ["_time"])`;
 
-      const data:any[] = [];
+      const data: any[] = [];
 
       this.queryClient.queryRows(fluxQuery, {
         next: (row, tableMeta) => {
@@ -374,7 +373,7 @@ export class PowerDataService {
         }))
         |> sort(columns: ["_time"])`;
 
-      const data:any[] = [];
+      const data: any[] = [];
 
       this.queryClient.queryRows(fluxQuery, {
         next: (row, tableMeta) => {
@@ -403,7 +402,7 @@ export class PowerDataService {
       |> pivot(rowKey:["_time"], columnKey: ["_field"], valueColumn: "_value")
       |> sort(columns: ["_time"])`;
 
-      const data:any[] = [];
+      const data: any[] = [];
 
       this.queryClient.queryRows(fluxQuery, {
         next: (row, tableMeta) => {
@@ -571,9 +570,9 @@ export class PowerDataService {
         type: 'solidgauge',
         dataLabels: {
           format: '<div style="text-align:center">' +
-          '<span style="font-size:16px">{y}</span><br/>' +
-          '<span style="font-size:10px;opacity:0.4">'+label+'</span>' +
-          '</div>'
+            '<span style="font-size:16px">{y}</span><br/>' +
+            '<span style="font-size:10px;opacity:0.4">' + label + '</span>' +
+            '</div>'
         },
         tooltip: {
           valueSuffix: label
@@ -620,7 +619,7 @@ export class PowerDataService {
     };
   }
 
-  getChartLineOptions(title: string, label: string, data: {title: string, color: string, values: any[]}[]): Highcharts.Options {
+  getChartLineOptions(title: string, label: string, data: { title: string, color: string, values: any[] }[]): Highcharts.Options {
     return {
       chart: {
         type: 'line'

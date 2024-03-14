@@ -1,5 +1,4 @@
 import { Injectable, NgZone } from '@angular/core';
-import { Router } from '@angular/router';
 import { SwUpdate } from '@angular/service-worker';
 import { Socket } from 'ngx-socket-io';
 import { Subscription, interval } from 'rxjs';
@@ -19,7 +18,7 @@ export class NewVersionCheckerService {
   ) {
     console.log('NewVersionCheckerService created');
     this.checkForUpdates();
-    document.onvisibilitychange = (e) => {
+    document.onvisibilitychange = () => {
       if (!document.hidden) {
         this.websocket.connect();
         this.websocket.emit('events', 'reload');
@@ -35,10 +34,10 @@ export class NewVersionCheckerService {
     this.zone.runOutsideAngular(() => {
       this.intervalSubscription = this.intervalSource.subscribe(async () => {
         try {
-            this.isNewVersionAvailable = await this.swUpdate.checkForUpdate();
-            console.log(this.isNewVersionAvailable ? 'A new version is available.' : 'Already on the latest version.');
+          this.isNewVersionAvailable = await this.swUpdate.checkForUpdate();
+          console.log(this.isNewVersionAvailable ? 'A new version is available.' : 'Already on the latest version.');
         } catch (error) {
-            console.error('Failed to check for updates:', error);
+          console.error('Failed to check for updates:', error);
         }
       });
     })
@@ -46,7 +45,7 @@ export class NewVersionCheckerService {
 
   applyUpdate(): void {
     this.swUpdate.activateUpdate()
-    .then(() => document.location.reload())
-    .catch(err => console.error('Failed to apply updates:', err));
+      .then(() => document.location.reload())
+      .catch(err => console.error('Failed to apply updates:', err));
   }
 }

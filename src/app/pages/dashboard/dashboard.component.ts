@@ -45,84 +45,84 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   items!: MenuItem[];
 
-    products!: Product[];
+  products!: Product[];
 
-    chartData: any;
+  chartData: any;
 
-    chartOptions: any;
+  chartOptions: any;
 
-    subscription!: Subscription;
+  subscription!: Subscription;
 
-    constructor(
-      public layoutService: LayoutService,
-      private readonly websocketService: Socket,
-      private readonly powerDataService: PowerDataService
-    ) {
-        this.subscription = this.layoutService.configUpdate$
-        .pipe(debounceTime(25))
-        .subscribe((config) => {
-        });
-        this.wsSubscription = this.websocketService.fromEvent('events').pipe(map((receivedMessage: any) => {
-          console.log('Received message from websocket: ', receivedMessage);
-          this.retieveNowData();
-          this.retrieveConsumoData();
-          this.retrieveInjetadaData();
-          this.retrieveGeracaoData();
-        })).subscribe();
-    }
-
-    ngOnInit() {
+  constructor(
+    public layoutService: LayoutService,
+    private readonly websocketService: Socket,
+    private readonly powerDataService: PowerDataService
+  ) {
+    this.subscription = this.layoutService.configUpdate$
+      .pipe(debounceTime(25))
+      .subscribe(() => {
+      });
+    this.wsSubscription = this.websocketService.fromEvent('events').pipe(map((receivedMessage: any) => {
+      console.log('Received message from websocket: ', receivedMessage);
       this.retieveNowData();
       this.retrieveConsumoData();
       this.retrieveInjetadaData();
       this.retrieveGeracaoData();
-    }
+    })).subscribe();
+  }
 
-    retrieveConsumoData() {
-      const startDay = moment.tz('America/Sao_Paulo').startOf('day').utc().toISOString();
-      const endDay = moment.tz('America/Sao_Paulo').utc().toISOString();
-      this.powerDataService.getConsumoData(startDay, endDay).subscribe((data: any) => {
-        this.chartConsumoOptions = this.powerDataService.getChartAreaOptions('Consumo de Energia [kWh]', 'kWh', 'darkred', data.map((d: any) => [moment.utc(d._time).valueOf(), d.ept_c]));
-      });
-    }
+  ngOnInit() {
+    this.retieveNowData();
+    this.retrieveConsumoData();
+    this.retrieveInjetadaData();
+    this.retrieveGeracaoData();
+  }
 
-    retrieveInjetadaData() {
-      const startDay = moment.tz('America/Sao_Paulo').startOf('day').utc().toISOString();
-      const endDay = moment.tz('America/Sao_Paulo').utc().toISOString();
-      this.powerDataService.getInjetadaData(startDay, endDay).subscribe((data: any) => {
-        this.chartInjetadaOptions = this.powerDataService.getChartAreaOptions('Energia Injetada (Geração) [kWh]', 'kWh', 'darkgreen', data.map((d: any) => [moment.utc(d._time).valueOf(), d.ept_g]));
-      });
-    }
+  retrieveConsumoData() {
+    const startDay = moment.tz('America/Sao_Paulo').startOf('day').utc().toISOString();
+    const endDay = moment.tz('America/Sao_Paulo').utc().toISOString();
+    this.powerDataService.getConsumoData(startDay, endDay).subscribe((data: any) => {
+      this.chartConsumoOptions = this.powerDataService.getChartAreaOptions('Consumo de Energia [kWh]', 'kWh', 'darkred', data.map((d: any) => [moment.utc(d._time).valueOf(), d.ept_c]));
+    });
+  }
 
-    retrieveGeracaoData() {
-      const startDay = moment.tz('America/Sao_Paulo').startOf('day').utc().toISOString();
-      const endDay = moment.tz('America/Sao_Paulo').utc().toISOString();
-      this.powerDataService.getGeracaoData(startDay, endDay).subscribe((data: any) => {
-        this.chartGeracaoOptions = this.powerDataService.getChartAreaOptions('Energia Gerada [kWh]', 'kWh', 'darkblue', data.map((d: any) => [moment.utc(d._time).valueOf(), d.total]));
-      });
-    }
+  retrieveInjetadaData() {
+    const startDay = moment.tz('America/Sao_Paulo').startOf('day').utc().toISOString();
+    const endDay = moment.tz('America/Sao_Paulo').utc().toISOString();
+    this.powerDataService.getInjetadaData(startDay, endDay).subscribe((data: any) => {
+      this.chartInjetadaOptions = this.powerDataService.getChartAreaOptions('Energia Injetada (Geração) [kWh]', 'kWh', 'darkgreen', data.map((d: any) => [moment.utc(d._time).valueOf(), d.ept_g]));
+    });
+  }
 
-    retieveNowData() {
-      this.powerDataService.getLastData().subscribe((data: any) => {
-        this.chartPotenciaAOptions = this.powerDataService.getGaugeOptions('Potência A', 'W', -10000, 10000, data.pa);
-        this.chartPotenciaBOptions = this.powerDataService.getGaugeOptions('Potência B', 'W', -10000, 10000, data.pb);
-        this.chartPotenciaCOptions = this.powerDataService.getGaugeOptions('Potência C', 'W', -10000, 10000, data.pc);
-        this.chartPotenciaTOptions = this.powerDataService.getGaugeOptions('Potência Total', 'W', -10000, 10000, data.pt);
-        this.chartCorrenteAOptions = this.powerDataService.getGaugeOptions('Corrente A', 'A', 0, 100, data.iarms);
-        this.chartCorrenteBOptions = this.powerDataService.getGaugeOptions('Corrente B', 'A', 0, 100, data.ibrms);
-        this.chartCorrenteCOptions = this.powerDataService.getGaugeOptions('Corrente C', 'A', 0, 100, data.icrms);
-        this.chartCorrenteTOptions = this.powerDataService.getGaugeOptions('Corrente Total', 'A', 0, 100, data.itrms);
-        this.chartTensaoAOptions = this.powerDataService.getGaugeOptions('Tensão A', 'V', 0, 300, data.uarms);
-        this.chartTensaoBOptions = this.powerDataService.getGaugeOptions('Tensão B', 'V', 0, 300, data.ubrms);
-        this.chartTensaoCOptions = this.powerDataService.getGaugeOptions('Tensão C', 'V', 0, 300, data.ucrms);
-      })
-    }
+  retrieveGeracaoData() {
+    const startDay = moment.tz('America/Sao_Paulo').startOf('day').utc().toISOString();
+    const endDay = moment.tz('America/Sao_Paulo').utc().toISOString();
+    this.powerDataService.getGeracaoData(startDay, endDay).subscribe((data: any) => {
+      this.chartGeracaoOptions = this.powerDataService.getChartAreaOptions('Energia Gerada [kWh]', 'kWh', 'darkblue', data.map((d: any) => [moment.utc(d._time).valueOf(), d.total]));
+    });
+  }
 
-    ngOnDestroy() {
-      this.wsSubscription.unsubscribe();
-    }
+  retieveNowData() {
+    this.powerDataService.getLastData().subscribe((data: any) => {
+      this.chartPotenciaAOptions = this.powerDataService.getGaugeOptions('Potência A', 'W', -10000, 10000, data.pa);
+      this.chartPotenciaBOptions = this.powerDataService.getGaugeOptions('Potência B', 'W', -10000, 10000, data.pb);
+      this.chartPotenciaCOptions = this.powerDataService.getGaugeOptions('Potência C', 'W', -10000, 10000, data.pc);
+      this.chartPotenciaTOptions = this.powerDataService.getGaugeOptions('Potência Total', 'W', -10000, 10000, data.pt);
+      this.chartCorrenteAOptions = this.powerDataService.getGaugeOptions('Corrente A', 'A', 0, 100, data.iarms);
+      this.chartCorrenteBOptions = this.powerDataService.getGaugeOptions('Corrente B', 'A', 0, 100, data.ibrms);
+      this.chartCorrenteCOptions = this.powerDataService.getGaugeOptions('Corrente C', 'A', 0, 100, data.icrms);
+      this.chartCorrenteTOptions = this.powerDataService.getGaugeOptions('Corrente Total', 'A', 0, 100, data.itrms);
+      this.chartTensaoAOptions = this.powerDataService.getGaugeOptions('Tensão A', 'V', 0, 300, data.uarms);
+      this.chartTensaoBOptions = this.powerDataService.getGaugeOptions('Tensão B', 'V', 0, 300, data.ubrms);
+      this.chartTensaoCOptions = this.powerDataService.getGaugeOptions('Tensão C', 'V', 0, 300, data.ucrms);
+    })
+  }
 
-    updateDados() {
-      this.powerDataService.updateData();
-    }
+  ngOnDestroy() {
+    this.wsSubscription.unsubscribe();
+  }
+
+  updateDados() {
+    this.powerDataService.updateData();
+  }
 }

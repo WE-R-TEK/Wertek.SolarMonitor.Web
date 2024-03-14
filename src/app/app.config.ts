@@ -2,13 +2,12 @@ import { ApplicationConfig, ErrorHandler, LOCALE_ID, importProvidersFrom, isDevM
 import { PreloadAllModules, provideRouter, withPreloading } from '@angular/router';
 
 import { routes } from './app.routes';
-import { AngularFireModule } from '@angular/fire/compat';
 import { environment } from '../environments/environment';
 import { provideAnimations } from '@angular/platform-browser/animations';
 import { provideHttpClient } from '@angular/common/http';
 import localePt from '@angular/common/locales/pt';
 import { registerLocaleData } from '@angular/common';
-import { AngularFireAuthModule, PERSISTENCE } from '@angular/fire/compat/auth';
+import { PERSISTENCE } from '@angular/fire/compat/auth';
 import { provideAuth } from '@angular/fire/auth';
 import { getAuth } from 'firebase/auth';
 import { provideFirebaseApp } from '@angular/fire/app';
@@ -16,11 +15,11 @@ import { initializeApp } from 'firebase/app';
 import { SocketIoConfig, SocketIoModule } from 'ngx-socket-io';
 import { provideServiceWorker } from '@angular/service-worker';
 import { LoadChunkErrorHandler } from './services/load-chunk-error.handler';
-import { DialogService, DynamicDialogModule } from 'primeng/dynamicdialog';
+import { DialogService } from 'primeng/dynamicdialog';
 
 registerLocaleData(localePt);
 
-const socketConfig: SocketIoConfig = { url: 'https://api-power.we-rtek.com', options: {}};
+const socketConfig: SocketIoConfig = { url: 'https://api-power.we-rtek.com', options: {} };
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -30,14 +29,14 @@ export const appConfig: ApplicationConfig = {
     importProvidersFrom(provideAuth(() => getAuth())),
     importProvidersFrom(SocketIoModule.forRoot(socketConfig)),
     importProvidersFrom(DialogService),
-    { provide: DialogService, useClass: DialogService},
+    { provide: DialogService, useClass: DialogService },
     provideAnimations(),
     provideHttpClient(),
     { provide: LOCALE_ID, useValue: 'pt' },
     { provide: PERSISTENCE, useValue: 'session' },
     provideServiceWorker('ngsw-worker.js', {
-        enabled: !isDevMode(),
-        registrationStrategy: 'registerWhenStable:30000'
+      enabled: !isDevMode(),
+      registrationStrategy: 'registerWhenStable:30000'
     })
-]
+  ]
 };

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges, ViewEncapsulation } from '@angular/core';
+import { Component, Input, OnChanges, OnDestroy, OnInit } from '@angular/core';
 import moment from 'moment';
 import { Socket } from 'ngx-socket-io';
 import { Subscription, map } from 'rxjs';
@@ -15,7 +15,7 @@ import { PowerTaxValueService } from '../../services/power-tax-value.service';
 })
 export class ResumoConsumoComponent implements OnInit, OnDestroy, OnChanges {
 
-  @Input({required: false}) date?: Date;
+  @Input({ required: false }) date?: Date;
 
   consHoje = 0;
   consHojeMoney = 0;
@@ -98,7 +98,7 @@ export class ResumoConsumoComponent implements OnInit, OnDestroy, OnChanges {
     this.injMesMoney = this.injMes * this.solarTax;
   }
 
-  ngOnChanges(changes: SimpleChanges): void {
+  ngOnChanges(): void {
     this.getPeriodPowerTaxValue();
     this.retrieveSumData();
   }
