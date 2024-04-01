@@ -435,6 +435,8 @@ export class PowerDataService {
         last
           |> map(fn: (r) => ({r with _value: r._value - first._value}))`;
 
+      console.log(fluxQuery);
+
 
       this.queryClient.queryRows(fluxQuery, {
         next: (row, tableMeta) => {
